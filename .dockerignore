@@ -1,0 +1,13 @@
+**
+!Dockerfile
+!requirements-v0.lock
+!src/
+!src/__init__.py
+!src/app.py
+!src/backend.py
+!model-cache/
+!model-cache/v0/
+!model-cache/v0/config.json
+!model-cache/v0/model.safetensors
+!model-cache/v0/tokenizer_config.json
+!model-cache/v0/vocab.txt

@@ -1,0 +1,20 @@
+# Python environment
+.venv/
+
+# Python generated files
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment variables and secrets
+.env*
+
+# Temporary files and package caches
+tmp/
+.pip-cache/
+.cache/
+
+# Downloaded model caches
+model-cache/
+models-cache/
+.huggingface/

@@ -1,0 +1,229 @@
+# Pre-registered before any performance run; values are rules, not results.
+registration:
+  plan: "Build Plan Version 1 plus Version 2 and user additions"
+  performance_runs_started: false
+  explicit_user_permission_to_commit_required: true
+  commit_required_before_any_performance_run: true
+  includes_thread_diagnostic: true
+  thresholds_must_not_change_after_measurement: true
+
+identity:
+  model_revision: "714eb0fa89d2f80546fda750413ed43d93601a13"
+  unchanged_between_versions: [dataset, model_revision]
+  dataset:
+    path: data/sentences.jsonl
+    sentences: 1000
+    seed: 20261010
+    sha256: "bfe687d4cff16e7d06e8580d09b5947760095b2829fceb0ac9b5fc7f70a99be0"
+    buckets: {short: 400, medium: 400, long: 200}
+    measured_order:
+      fixed_seeded: true
+      seed: 20261010
+      identical_for_all_official_and_diagnostic_runs: true
+    successful_records_per_sentence_id_per_measured_run: 1
+    intentionally_truncated_measured_inputs: 0
+
+common_run_rules:
+  warmup_requests: 100
+  measured_requests: 1000
+  every_sentence_id_exactly_once: true
+  warmups_separate_from_measured_requests: true
+  warmups_excluded_from_all_statistics_and_label_comparison: true
+  collect_all_required_measurements: true
+  same_vm: true
+  comparable_test_conditions: true
+  container:
+    cpus: 4
+    memory_limit: "2g"
+    memory_limit_bytes: 2147483648
+    non_root: true
+    server_workers: 1
+    model_threads: "chosen_by_v0_diagnostic_then_frozen_identically_for_v0_v1_v2"
+
+invalid_runs:
+  invalid_if:
+    - "Any failed request, including any warm-up failure"
+    - "Required per-request data or coverage is missing or inconsistent"
+    - "Not exactly one successful measured record for every one of the 1000 sentence IDs"
+  save_invalid_attempts: true
+  invalid_status: INVALID
+  preserve_errors_and_partial_observations: true
+  count_toward_medians: false
+  repeat_same_run_slot: true
+  max_retries_after_original: 2
+  max_attempts_per_run_slot: 3
+  exhausted_action: "Stop all further benchmark execution and report raw failure output to the user"
+  applies_to: [official_benchmarks, thread_diagnostic]
+
+statistics:
+  latency_unit: milliseconds
+  percentiles: [50, 95, 99]
+  percentile_method: nearest_rank
+  percentile_formula: "For N sorted latencies, pXX is the latency at 1-based index ceil((XX/100) * N)"
+  p99_index_for_1000: 990
+  setting_summary: "Median of three valid run-level statistics and their range"
+  range_definition: "Minimum and maximum of the three valid run-level statistics"
+
+mandatory_measurements:
+  per_request:
+    - sentence_id
+    - client_observed_request_latency_ms
+    - predicted_label
+    - tokenize_ms
+    - model_ms
+    - postprocess_ms
+    - server_total_ms
+  per_run:
+    - version
+    - concurrency
+    - validity_status
+    - error_count
+    - failure_details
+    - warmup_request_count
+    - measured_request_count
+    - seed
+    - dataset_sha256
+    - model_revision
+    - container_id
+    - image_identity
+    - hardware
+    - cpu_architecture
+    - cpu_limit
+    - memory_limit
+    - actual_model_threads
+    - server_workers
+    - relevant_software_versions
+    - load_runner_git_commit
+    - load_runner_file_sha256
+    - peak_container_memory
+    - peak_memory_measurement_method
+    - startup_time_seconds
+    - docker_image_size_bytes
+    - run_timing
+    - throughput_requests_per_second
+  report:
+    - p50
+    - p95
+    - p99
+    - throughput_requests_per_second
+    - peak_container_memory
+    - startup_time_seconds
+    - docker_image_size_bytes
+    - label_agreement_with_v0
+    - client_observed_request_latencies
+    - server_stage_timings
+
+measurement_definitions:
+  clock: monotonic_high_resolution
+  client_latency: "Elapsed from issuing a request until its complete response is received"
+  server_stages: "Tokenization, model inference, and postprocessing measured separately"
+  server_total: "Handler entry through inference, before response serialization"
+  throughput: "Successful measured requests divided by measured-phase elapsed seconds; excludes warm-ups"
+  peak_memory:
+    preferred: "Container's own cgroup memory.peak counter, if exposed by the kernel and access is permitted"
+    fallback: "Sample the container's memory statistics during the run"
+    fallback_min_samples_per_second: 1
+    fallback_label: "sampled peak"
+    fallback_label_required_in: [saved_result, README.md]
+    sampled_maximum_must_not_be_called_cgroup_peak: true
+  startup:
+    unit: seconds
+    start: "Issuing the Docker container start command"
+    end: 'GET /health first returns {"status":"ok","version":"..."} for that version'
+    record_each_run: true
+  image_size:
+    unit: bytes
+    source: "Docker's actual built-image size field"
+    estimates_allowed: false
+  capture_during_run_not_fabricated_afterward: true
+  label_agreement_source: "Only saved per-request sentence IDs and labels"
+  fresh_inference_for_reported_agreement_allowed: false
+  report_generator:
+    reads_saved_result_files_only: true
+    takes_new_measurements: false
+
+official_benchmarks:
+  versions: [v0, v1, v2]
+  concurrency: [1, 4]
+  valid_runs_per_version_and_concurrency: 3
+  runner_frozen_before_official_v0: true
+  runner_unchanged_across_versions: true
+  separate_onnx_runtime_tuning_allowed: false
+  same_version_variation:
+    threshold_fraction: 0.10
+    comparator: ">"
+    rule: "If same-version runs vary by over 10%, disclose this variation in README.md"
+
+acceptance:
+  fraction_units: "0.20 = 20%; 0.99 = 99%; 0.10 = 10%; all gains and spreads are fractions"
+  primary_concurrency: 4
+  baseline_version: v0
+  baseline_valid_runs: 3
+  candidate_valid_runs: 3
+  formulas:
+    B: "median of the three valid v0 baseline p99 values"
+    C: "median of the three valid candidate p99 values"
+    I: "(B - C) / B"
+    S: "(max(baseline p99 runs) - min(baseline p99 runs)) / B"
+  performance:
+    improvement_threshold_fraction: 0.20
+    improvement_comparator: ">="
+    noise_comparator: ">"
+    noise_reference: S
+    PASS: "I >= 0.20 AND I > S"
+    INCONCLUSIVE: "I >= 0.20 AND I <= S"
+    FAIL: "I < 0.20"
+  quality:
+    name: label_agreement
+    ground_truth_accuracy: false
+    agreement_threshold_fraction: 0.99
+    comparator: ">="
+    sentence_ids_compared: 1000
+    minimum_matching_sentence_ids: 990
+    baseline_version: v0
+  overall:
+    reject_precedence: "REJECT if performance FAIL or label agreement < 0.99, even if another condition is inconclusive"
+    KEEP: "Performance PASS and quality PASS, with all required validity and correctness tests satisfied"
+    INCONCLUSIVE: "Performance INCONCLUSIVE and quality PASS; this is not KEEP"
+    unresolved_mandatory_parity_or_validity_failure: "Prevents KEEP and must be disclosed"
+    rejected_and_inconclusive_experiments_must_be_disclosed: true
+  acceptance_comparisons: ["v1 versus v0", "v2 versus v0"]
+  informational_comparisons: ["v2 versus v1"]
+  concurrency_1:
+    report_in_full_including_regressions: true
+    decides_keep_or_reject: false
+
+thread_diagnostic:
+  scheduled: "Day 2, after load runner implementation and tests"
+  selection_version: v0
+  only_v0_exists_during_selection: true
+  candidate_model_threads: [4, 2, 1]
+  concurrency: 4
+  valid_repetitions_per_candidate: 3
+  warmup_requests_per_repetition: 100
+  measured_requests_per_repetition: 1000
+  uses_complete_fixed_dataset_exactly_once: true
+  identical_seeded_order: true
+  identical_short_diagnostic_repetitions: true
+  records_request_latency_and_required_run_metadata: true
+  invalid_run_rules: invalid_runs
+  run_statistic: "Median client-observed request latency"
+  candidate_score: "Median of three valid run-level medians"
+  formulas:
+    M4: "Candidate score at four model threads"
+    Mbest: "Lowest candidate score among 4, 2, and 1 threads"
+    G: "(M4 - Mbest) / M4"
+    N: "(highest valid four-thread run median - lowest valid four-thread run median) / M4"
+  gain_threshold_fraction: 0.05
+  gain_comparator: ">="
+  noise_comparator: ">"
+  choose_winning_candidate_if: "G >= 0.05 AND G > N"
+  otherwise_model_threads: 4
+  exact_eligible_non_four_thread_score_tie: "Prefer the higher thread count"
+  official_baseline_p99_benchmark: false
+  after_selection:
+    freeze_model_threads: true
+    identical_for_versions: [v0, v1, v2]
+    record_selection_came_from_v0_only: true
+    disclose_later_onnx_threading_problems: true
+    retuning_to_favor_any_version_allowed: false
