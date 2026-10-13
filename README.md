@@ -110,3 +110,60 @@ Preserved setting summaries:
 - `results/thread-diagnostic/summary-57cf556e176c456bb9ed645fd7d57545.json`
 - `results/thread-diagnostic/summary-e9ddf435b28d4c9a9b2f81014a72b558.json`
 - `results/thread-diagnostic/summary-f3ec26f64be24816bb545130ffcb7985.json`
+
+## Official v0 baseline
+
+Measured on 2026-10-12, 22:40–23:02 America/New_York (2026-10-13, 02:40–03:02 UTC). These are official v0 PyTorch baseline measurements, not optimized-model results. Six VALID attempts completed: three repetitions each at concurrency 1 and 4, in that order; zero INVALID attempts and zero retries. Each repetition passed verification of 100 separate successful warm-ups and all 1,000 successful measured sentence IDs exactly once in the same seeded order.
+
+The unchanged environment was an aarch64 VM running Ubuntu 26.04.1 LTS and Linux 7.0.0-38-generic. Docker image `measured-model-serving:v0` was linux/arm64, identity `sha256:d310c95bd14a88704c2b5721f78165910e3e907907b21be10b635b0830a3ab4c`. All containers used **MODEL_THREADS=4**, 4 CPUs, 2,147,483,648 bytes of RAM, non-root UID/GID 10001, and one Uvicorn worker. Model revision: `714eb0fa89d2f80546fda750413ed43d93601a13`; dataset SHA-256: `bfe687d4cff16e7d06e8580d09b5947760095b2829fceb0ac9b5fc7f70a99be0`.
+
+Runtime packages were Python 3.14.4, CPU PyTorch 2.14.1+cpu, Transformers 5.19.0, FastAPI 0.143.0, Uvicorn 0.54.0, tokenizers 0.23.3, and NumPy 2.5.4. The client used Python 3.14.4, httpx 0.28.1, and PyYAML 6.0.3. Complete hardware and software metadata is preserved in each attempt.
+
+Frozen runner Git commit: `cca39eb2924ed5bed8b80aeba78309fa44a2ea34`; runner SHA-256: `f61e09b2f0af90d6e64bcda44844dc87024197f354e01a5e0f8ee21f93d6ac33`. Thresholds SHA-256 remains `3f31248914dcd93754995f23002a15bcc8e7329259b6787ff638a4d7bc795439`.
+
+Per-run client latencies use the registered nearest-rank positions 500, 950, and 990 of 1,000 measured requests. Warm-ups are excluded. Throughput is 1,000 divided by measured-phase elapsed seconds.
+
+| Concurrency | Run | p50 (ms) | p95 (ms) | p99 (ms) | Throughput (requests/s) | Peak memory (bytes) | Startup (s) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 1 | 238.543110 | 467.567909 | 553.931729 | 3.860035 | 412155904 | 8.129933 |
+| 1 | 2 | 264.980276 | 521.658491 | 606.837001 | 3.481548 | 408510464 | 7.967704 |
+| 1 | 3 | 263.127529 | 501.834485 | 568.889771 | 3.568621 | 406372352 | 8.145302 |
+| 4 | 1 | 363.729137 | 859.620583 | 987.331188 | 9.566476 | 613081088 | 11.309167 |
+| 4 | 2 | 367.973152 | 865.230095 | 1028.586478 | 9.467402 | 480747520 | 8.624873 |
+| 4 | 3 | 369.104750 | 836.103477 | 983.507651 | 9.462252 | 527626240 | 10.981760 |
+
+Setting summaries below are medians of the three run-level statistics, with their minimum–maximum ranges in parentheses.
+
+| Concurrency | p50 (ms) | p95 (ms) | p99 (ms) | Throughput (requests/s) |
+| --- | --- | --- | --- | --- |
+| 1 | 263.127529 (238.543110–264.980276) | 501.834485 (467.567909–521.658491) | 568.889771 (553.931729–606.837001) | 3.568621 (3.481548–3.860035) |
+| 4 | 367.973152 (363.729137–369.104750) | 859.620583 (836.103477–865.230095) | 987.331188 (983.507651–1028.586478) | 9.467402 (9.462252–9.566476) |
+
+Every memory value is the container's own **cgroup memory.peak**, not a sampled estimate. Concurrency 1 peak memory median was 408,510,464 bytes (406,372,352–412,155,904); concurrency 4 was 527,626,240 bytes (480,747,520–613,081,088). Startup spans issuing Docker start through the first correct v0 /health response: concurrency 1 median 8.129933025 s (7.967704388–8.145302117); concurrency 4 median 10.981760057 s (8.624873232–11.309166664). Docker reported the actual image size as **2,106,058,478 bytes** in every run, so both setting medians and ranges equal that value.
+
+Server-stage timing medians (milliseconds), in tokenize/model/postprocess/server-total order:
+
+| Concurrency | Run 1 | Run 2 | Run 3 | Median of run medians |
+| --- | --- | --- | --- | --- |
+| 1 | 0.527144 / 228.259600 / 0.065375 / 229.089209 | 0.559789 / 249.665183 / 0.070822 / 250.551122 | 0.555839 / 248.297047 / 0.071522 / 248.984893 | 0.555839 / 248.297047 / 0.070822 / 248.984893 |
+| 4 | 0.606011 / 345.727573 / 0.065000 / 347.867837 | 0.620613 / 345.766278 / 0.066377 / 348.527117 | 0.613414 / 341.333963 / 0.065226 / 341.999702 | 0.613414 / 345.727573 / 0.065226 / 347.867837 |
+
+Tokenize/model/postprocess are measured separately; server-total spans handler entry through inference before serialization. Each JSON preserves all per-request timings, each run's stage ranges, and each summary's range of run-stage medians.
+
+The frozen concurrency-4 baseline p99 noise reference is **S = (1028.586478 - 983.507651) / 987.331188 = 0.04565725011818419 (4.565725011818419%)**. The registered 10% same-version variation threshold was **not exceeded for p99** at either concurrency (concurrency 1: 9.29974042370327%; concurrency 4: 4.565725011818419%). Using (maximum - minimum) / median to disclose other run-level variation, concurrency 1 exceeded 10% for p50 (10.04728243391059%), p95 (10.778570149478676%), and throughput (10.605999578319499%); concurrency 4 exceeded it for peak memory (25.080930015914293%) and startup (24.443198704646388%). Valid runs were retained without rerunning or tuning.
+
+Preserved original attempt evidence, in run order:
+
+- Concurrency 1, run 1: `results/v0-baseline/attempt-cf0ea92acea54b6b99cf1176d3225e6e.json`
+- Concurrency 1, run 2: `results/v0-baseline/attempt-f6612b3b9db344ad8dd45222aa69606c.json`
+- Concurrency 1, run 3: `results/v0-baseline/attempt-692ebe3ba524439e9027fddf80d949ff.json`
+- Concurrency 4, run 1: `results/v0-baseline/attempt-f78e100ceefc45f8ace980ce57808610.json`
+- Concurrency 4, run 2: `results/v0-baseline/attempt-1040d6c3275b4f74a94278599fd78d24.json`
+- Concurrency 4, run 3: `results/v0-baseline/attempt-d46685a9b179494cb78f02aed2219675.json`
+
+Preserved original summaries:
+
+- `results/v0-baseline/summary-6f538529b57545fc90efe02db0ad37a2.json`
+- `results/v0-baseline/summary-a05f97da5df344699b971f7ca96088f9.json`
+
+All six attempts and both summaries passed coverage, schema, configuration, provenance, and statistics checks. Docker reported no remaining containers after each setting. Original diagnostic evidence, runner, thresholds, and dataset remain unchanged. No v1/v2 comparison or KEEP/REJECT decision was made.
