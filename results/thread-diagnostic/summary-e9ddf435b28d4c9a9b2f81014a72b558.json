@@ -1,0 +1,97 @@
+{
+  "mode": "diagnostic",
+  "version": "v0",
+  "concurrency": 4,
+  "model_threads": 2,
+  "valid_attempt_files": [
+    "results/thread-diagnostic/attempt-2f85a170dca847ed8c8f7b3fc1aafef6.json",
+    "results/thread-diagnostic/attempt-9b768af911444d198161132d1ce4d899.json",
+    "results/thread-diagnostic/attempt-b28cca66a4d2413dabd083567c8c6ce3.json"
+  ],
+  "statistics": {
+    "p50": {
+      "median": 402.465373,
+      "range": [
+        368.700545,
+        408.368784
+      ]
+    },
+    "p95": {
+      "median": 784.19438,
+      "range": [
+        755.627838,
+        797.31624
+      ]
+    },
+    "p99": {
+      "median": 894.609468,
+      "range": [
+        874.001456,
+        896.382755
+      ]
+    },
+    "throughput_requests_per_second": {
+      "median": 9.031372322289661,
+      "range": [
+        8.89310616607464,
+        9.720915324071832
+      ]
+    },
+    "startup_time_seconds": {
+      "median": 8.226122167,
+      "range": [
+        7.283171945,
+        8.87265327
+      ]
+    },
+    "peak_container_memory": {
+      "median": 510955520,
+      "range": [
+        469667840,
+        511545344
+      ]
+    },
+    "docker_image_size_bytes": {
+      "median": 2106058478,
+      "range": [
+        2106058478,
+        2106058478
+      ]
+    },
+    "server_stage_timings": {
+      "tokenize": {
+        "median_ms": 0.5840609999999999,
+        "range_ms": [
+          0.5800609999999999,
+          0.592103
+        ]
+      },
+      "model": {
+        "median_ms": 381.62378149999995,
+        "range_ms": [
+          355.5534305,
+          390.53565949999995
+        ]
+      },
+      "postprocess": {
+        "median_ms": 0.0693335,
+        "range_ms": [
+          0.06889600000000001,
+          0.07022900000000001
+        ]
+      },
+      "server_total": {
+        "median_ms": 383.36810649999995,
+        "range_ms": [
+          356.60686450000003,
+          391.659095
+        ]
+      }
+    },
+    "peak_memory_measurement_methods": [
+      "cgroup memory.peak",
+      "cgroup memory.peak",
+      "cgroup memory.peak"
+    ]
+  }
+}

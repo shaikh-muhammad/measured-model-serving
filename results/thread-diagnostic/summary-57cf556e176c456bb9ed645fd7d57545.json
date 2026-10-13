@@ -1,0 +1,97 @@
+{
+  "mode": "diagnostic",
+  "version": "v0",
+  "concurrency": 4,
+  "model_threads": 4,
+  "valid_attempt_files": [
+    "results/thread-diagnostic/attempt-baf51cfa5f814e25958fdaac116a3f80.json",
+    "results/thread-diagnostic/attempt-ae1810110c1042f089fecf26a44a2e27.json",
+    "results/thread-diagnostic/attempt-e71de5075c7440b0b66af23c64515415.json"
+  ],
+  "statistics": {
+    "p50": {
+      "median": 317.805658,
+      "range": [
+        317.349576,
+        327.236219
+      ]
+    },
+    "p95": {
+      "median": 724.708479,
+      "range": [
+        712.311967,
+        755.711114
+      ]
+    },
+    "p99": {
+      "median": 869.672675,
+      "range": [
+        848.599934,
+        898.010358
+      ]
+    },
+    "throughput_requests_per_second": {
+      "median": 10.930973943104096,
+      "range": [
+        10.744356433004135,
+        11.21143144527555
+      ]
+    },
+    "startup_time_seconds": {
+      "median": 9.647823484,
+      "range": [
+        7.405753957,
+        14.551696118
+      ]
+    },
+    "peak_container_memory": {
+      "median": 565075968,
+      "range": [
+        538939392,
+        1114566656
+      ]
+    },
+    "docker_image_size_bytes": {
+      "median": 2106058478,
+      "range": [
+        2106058478,
+        2106058478
+      ]
+    },
+    "server_stage_timings": {
+      "tokenize": {
+        "median_ms": 0.559061,
+        "range_ms": [
+          0.5586445,
+          0.5748525
+        ]
+      },
+      "model": {
+        "median_ms": 299.62913949999995,
+        "range_ms": [
+          296.89522850000003,
+          306.6134975
+        ]
+      },
+      "postprocess": {
+        "median_ms": 0.059916,
+        "range_ms": [
+          0.0593545,
+          0.061458
+        ]
+      },
+      "server_total": {
+        "median_ms": 300.77544950000004,
+        "range_ms": [
+          297.950477,
+          307.979057
+        ]
+      }
+    },
+    "peak_memory_measurement_methods": [
+      "cgroup memory.peak",
+      "cgroup memory.peak",
+      "cgroup memory.peak"
+    ]
+  }
+}
