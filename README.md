@@ -189,3 +189,120 @@ The corrected model uses MatMul-only dynamic `QuantType.QInt8` quantization: **3
 `measured-model-serving:v2` is a Python 3.14.4 linux/arm64 image, **720,020,107 bytes**, using the unchanged v1 CPU dependency pins and standalone tokenizer. PyTorch, Transformers, NVIDIA/CUDA packages and GPU libraries, and Triton are absent. A minimal v2 identity adapter preserves startup hash verification while reusing the existing backend's inference and tokenizer implementation. The image retains UID/GID 10001, four model threads, one worker, and the frozen runner's `src.app:app` entry point.
 
 The network-isolated container passed health, all ten saved-v0/v2 prediction comparisons, the unchanged public response schema, input validation, Unicode/emoji, and exact 256/257-token boundaries under 4 CPUs and 2 GiB RAM. Its temporary container was removed. The v2 service/quantization suite passed **52 tests** (33 service tests); the combined regression suite passed **195 tests**. Container evidence, package inventory, commands, and warnings are in `results/checks/v2-container.json`. **Official v2 performance benchmarks have NOT run**; no speed improvement or performance acceptance decision has been established.
+
+## Official v1 and v2 benchmarks
+
+Measured on **2026-10-14, 22:59–23:32 America/New_York** (2026-10-15, 02:59–03:32 UTC), on the same aarch64 VM running Ubuntu 26.04.1 LTS and Linux 7.0.0-38-generic. All containers used frozen **MODEL_THREADS=4**, 4 CPUs, 2 GiB RAM, non-root UID/GID 10001, and one Uvicorn worker. Images, artifacts, service code and measurement settings were unchanged.
+
+Execution order was v1/concurrency 1, v1/concurrency 4, v2/concurrency 1, then v2/concurrency 4. Each setting completed three VALID repetitions: **12 VALID attempts, zero INVALID attempts, zero retries**. Each repetition had 100 successful separate warm-ups and all 1,000 successful measured sentence IDs exactly once in the same seeded order (20261010). Warm-ups were excluded from request statistics and label comparison. The first saved v1 attempt and every completed setting were validated read-only before proceeding.
+
+Original v0 observations were read without remeasurement. Latencies use nearest-rank positions 500/950/990; throughput is 1,000 divided by measured-phase seconds. Cells below show the median of the three run-level statistics, followed by their minimum–maximum range.
+
+| Version | Concurrency | p50 ms | p95 ms | p99 ms | Requests/s |
+| --- | --- | --- | --- | --- | --- |
+| v0 | 1 | 263.127529 (238.543110–264.980276) | 501.834485 (467.567909–521.658491) | 568.889771 (553.931729–606.837001) | 3.568621 (3.481548–3.860035) |
+| v0 | 4 | 367.973152 (363.729137–369.104750) | 859.620583 (836.103477–865.230095) | 987.331188 (983.507651–1028.586478) | 9.467402 (9.462252–9.566476) |
+| v1 | 1 | 161.981393 (152.645517–166.256699) | 449.277257 (440.213071–478.532524) | 569.923653 (556.269799–613.368213) | 5.022235 (4.780366–5.255713) |
+| v1 | 4 | 402.820539 (395.367355–416.879244) | 985.267498 (967.385086–1000.916849) | 1233.355484 (1213.410183–1271.798754) | 8.510558 (8.396170–8.701532) |
+| v2 | 1 | 93.116056 (89.032169–97.797401) | 233.837834 (227.630708–240.739466) | 310.740351 (301.079745–316.840813) | 9.011440 (8.841494–9.428666) |
+| v2 | 4 | 278.551001 (261.315565–282.404815) | 522.090772 (515.484890–546.227027) | 625.352030 (612.040066–668.270409) | 13.519013 (13.394471–14.155556) |
+
+| Version | Concurrency | Peak memory bytes | Startup seconds | Image size bytes |
+| --- | --- | --- | --- | --- |
+| v0 | 1 | 408510464 (406372352–412155904) | 8.129933025 (7.967704388–8.145302117) | 2106058478 (2106058478–2106058478) |
+| v0 | 4 | 527626240 (480747520–613081088) | 10.981760057 (8.624873232–11.309166664) | 2106058478 (2106058478–2106058478) |
+| v1 | 1 | 494940160 (494280704–835268608) | 3.858928727 (3.679682374–5.385727450) | 983250492 (983250492–983250492) |
+| v1 | 4 | 549056512 (548065280–554631168) | 3.991549434 (3.937453201–4.435775162) | 983250492 (983250492–983250492) |
+| v2 | 1 | 300486656 (292913152–302333952) | 2.686598337 (2.490054628–2.748774862) | 720020107 (720020107–720020107) |
+| v2 | 4 | 323043328 (321101824–324096000) | 3.246321130 (2.643636291–3.353619865) | 720020107 (720020107–720020107) |
+
+All memory values use the container’s own **cgroup memory.peak**, including initialization and warm-ups; none is a sampled estimate. Startup spans issuing Docker start through the first correct version-specific health response. Image sizes are Docker’s actual built-image size values.
+
+Run-level client observations (milliseconds, requests/s, bytes, and seconds respectively):
+
+| Version | Concurrency | Run | p50 | p95 | p99 | Requests/s | Peak memory | Startup s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| v1 | 1 | 1 | 166.256699 | 478.532524 | 613.368213 | 4.780366 | 835268608 | 5.385727450 |
+| v1 | 1 | 2 | 161.981393 | 449.277257 | 569.923653 | 5.022235 | 494280704 | 3.858928727 |
+| v1 | 1 | 3 | 152.645517 | 440.213071 | 556.269799 | 5.255713 | 494940160 | 3.679682374 |
+| v1 | 4 | 1 | 416.879244 | 985.267498 | 1213.410183 | 8.396170 | 554631168 | 3.937453201 |
+| v1 | 4 | 2 | 402.820539 | 1000.916849 | 1233.355484 | 8.510558 | 549056512 | 4.435775162 |
+| v1 | 4 | 3 | 395.367355 | 967.385086 | 1271.798754 | 8.701532 | 548065280 | 3.991549434 |
+| v2 | 1 | 1 | 89.032169 | 227.630708 | 310.740351 | 9.428666 | 300486656 | 2.686598337 |
+| v2 | 1 | 2 | 97.797401 | 233.837834 | 301.079745 | 8.841494 | 302333952 | 2.490054628 |
+| v2 | 1 | 3 | 93.116056 | 240.739466 | 316.840813 | 9.011440 | 292913152 | 2.748774862 |
+| v2 | 4 | 1 | 282.404815 | 515.484890 | 625.352030 | 13.519013 | 324096000 | 3.246321130 |
+| v2 | 4 | 2 | 278.551001 | 546.227027 | 668.270409 | 13.394471 | 323043328 | 3.353619865 |
+| v2 | 4 | 3 | 261.315565 | 522.090772 | 612.040066 | 14.155556 | 321101824 | 2.643636291 |
+
+Server-stage medians for each run (milliseconds); each original JSON preserves all per-request stage timings and ranges. Server total spans handler entry through inference, before serialization.
+
+| Version | Concurrency | Run | Tokenize | Model | Postprocess | Server total |
+| --- | --- | --- | --- | --- | --- | --- |
+| v1 | 1 | 1 | 42.715678 | 115.942341 | 0.068859 | 157.627493 |
+| v1 | 1 | 2 | 39.320499 | 110.572792 | 0.072177 | 152.280659 |
+| v1 | 1 | 3 | 37.223011 | 106.337961 | 0.071838 | 143.349858 |
+| v1 | 4 | 1 | 94.452124 | 239.389784 | 0.071071 | 352.470804 |
+| v1 | 4 | 2 | 89.083338 | 235.274095 | 0.069694 | 343.196992 |
+| v1 | 4 | 3 | 85.473747 | 226.572306 | 0.071296 | 334.968316 |
+| v2 | 1 | 1 | 37.612896 | 43.039369 | 0.069153 | 80.940677 |
+| v2 | 1 | 2 | 39.316501 | 46.190486 | 0.069152 | 88.633931 |
+| v2 | 1 | 3 | 37.830668 | 44.921972 | 0.069423 | 83.060486 |
+| v2 | 4 | 1 | 82.341829 | 103.048187 | 0.068588 | 201.814199 |
+| v2 | 4 | 2 | 83.188111 | 105.484013 | 0.068634 | 203.088664 |
+| v2 | 4 | 3 | 79.228876 | 102.120992 | 0.067302 | 191.316963 |
+
+Stage summaries below show the median and minimum–maximum of the three run-level medians:
+
+| Version | Concurrency | Tokenize ms | Model ms | Postprocess ms | Server total ms |
+| --- | --- | --- | --- | --- | --- |
+| v1 | 1 | 39.320499 (37.223011–42.715678) | 110.572792 (106.337961–115.942341) | 0.071838 (0.068859–0.072177) | 152.280659 (143.349858–157.627493) |
+| v1 | 4 | 89.083338 (85.473747–94.452124) | 235.274095 (226.572306–239.389784) | 0.071071 (0.069694–0.071296) | 343.196992 (334.968316–352.470804) |
+| v2 | 1 | 37.830668 (37.612896–39.316501) | 44.921972 (43.039369–46.190486) | 0.069153 (0.069152–0.069423) | 83.060486 (80.940677–88.633931) |
+| v2 | 4 | 82.341829 (79.228876–83.188111) | 103.048187 (102.120992–105.484013) | 0.068588 (0.067302–0.068634) | 201.814199 (191.316963–203.088664) |
+
+**Official HTTP label agreement:** both optimized versions matched the mutually agreeing original six v0 baseline label sets on all 1,000 unique IDs in every repetition: **6,000/6,000 recorded labels per version, 100% agreement**. Mismatch counts for short/medium/long are all zero, with no differences between repetitions or concurrency settings. These actual HTTP labels also match the committed offline v1 export and corrected v2 quantization evidence. Label agreement is not ground-truth accuracy.
+
+The registered primary gate uses B = 987.331188 ms, S = 0.04565725011818419 (4.565725011818419%), and I = (B−C)/B. It requires I ≥20% **and** I > S, ≥99% label agreement, and all mandatory correctness and validity checks.
+
+| Version | C: median concurrency-4 p99 ms | I: p99 improvement | Performance | Quality | Registered outcome |
+| --- | --- | --- | --- | --- | --- |
+| v1 | 1233.355484 | -24.918112482% | FAIL | PASS (100%) | **REJECT** |
+| v2 | 625.352030 | 36.662384659% | PASS | PASS (100%) | **KEEP** |
+
+V1 is **REJECT** because its concurrency-4 p99 regressed by 24.918112482% and fails I ≥20%; passing quality cannot override performance failure. V2 is **KEEP for this registered experiment** because its 36.662384659% improvement exceeds both 20% and baseline spread, its quality passes, and all mandatory validity and previously committed correctness checks pass. Neither version enters the INCONCLUSIVE branch (I ≥20% but I ≤S). Concurrency 1 does not decide acceptance; v1’s slightly worse p99 there is retained and reported.
+
+Relative spread is (maximum−minimum)/median. Concurrency-4 p99 spread is 4.734123435% for v1 and 8.991790272% for v2. All optimized-setting spreads above the registered 10% disclosure threshold are listed below, including stage medians. These warnings do not add a new acceptance formula; no valid noisy observation was replaced.
+
+- v1, concurrency 1 — p99: 10.018607527%.
+- v1, concurrency 1 — peak_container_memory: 68.894773865%.
+- v1, concurrency 1 — startup_time_seconds: 44.210328739%.
+- v1, concurrency 4 — startup_time_seconds: 12.484424138%.
+- v2, concurrency 4 — startup_time_seconds: 21.870404854%.
+- v1, concurrency 1 — tokenize stage median: 13.968966925%.
+- v1, concurrency 4 — tokenize stage median: 10.078627105%.
+
+All experiment containers were removed and all three image IDs remained unchanged. Frozen runner SHA-256: `f61e09b2f0af90d6e64bcda44844dc87024197f354e01a5e0f8ee21f93d6ac33`; recorded runner Git commit: `0a40c4eb7e7577ee7c8b06ff520864cdd9d8f9fe`. Runner bytes match those used for the original v0 baseline, whose recorded HEAD was earlier. No export, quantization, image rebuild, thread retuning, or v0 remeasurement occurred.
+
+Limitations: three repetitions on one shared desktop VM and a fixed synthetic dataset do not establish general performance or accuracy. Optimized runs were sequential and the original baseline was measured on an earlier date; unrecorded host-load or VM scheduling differences remain possible. No unrelated heavy workload was launched or user process stopped. Memory counters include startup and warm-ups; smaller images alone do not demonstrate faster inference. Earlier integration notes describe their historical pre-benchmark state.
+
+Original result paths and SHA-256 hashes (six attempts and two summaries per version; all originals preserved):
+
+```text
+b07d24a12eb3d97a9dff2d32ac6e344ca79f02c6093157f20a8ffd9383b4cd58  results/v1-official/attempt-57f9c386c6724d6fafa7f92dcac29082.json
+e3d0e8b739d1c9cea102b277a40ef44bc3e550368d151f42f83d8e4ff49c7f66  results/v1-official/attempt-5e9e84aaf4664cd581795c09d4731206.json
+642162a734016979e9c92729cee7e440f3dc17012af4315999d84a2c30cfff94  results/v1-official/attempt-b02462327cab4e869a10d664fb598177.json
+ab01c665f9fbd5f98865d27c07c8c933a950a4ad784e626db3bc0cfba7ca217a  results/v1-official/attempt-c04413f245f047f5a3a8808ae4abea5f.json
+b77cd04ee2244cb20a734e9c0907f9ce927817a30f6a7f637603f4679a2b5d97  results/v1-official/attempt-e87b51c5d5304dd0a6cfd12e33f76671.json
+f8053d7d6b4ba515e5e94ef49f5344ec7e6be5cdc48d2198c1e4ed572b6e2a00  results/v1-official/attempt-ec55d0b8a88c4da9b49b779b40bf6da3.json
+ec85187349ed7b8fe5952fa03e08dd8a2568fdadfcc7fddc297aacb1abd8c22e  results/v1-official/summary-2c94ca783707487b85afc345c16dbbe9.json
+77aacc2a4987f2d9cd5ab25623401ca67b3d2dc01b2ce354990e6a6c75b28662  results/v1-official/summary-ba51d0c2eac04d39a0e6cd238e45110d.json
+a8193282c07c616587b81697a733aa2b53f427a2a73d4234a0bf217d583c52ae  results/v2-official/attempt-1c27a767a2c94168be97a447e949d3cd.json
+9acae347a37b2f0cf262f909e0e83831e19d4db175c5dc6289bba80d6a0d43c9  results/v2-official/attempt-96b154b38fe1423d9eb2d1c0d76c7bfe.json
+4166838bccfb4f0fdf7242883888a693b09205216ca26285461f8bb8658116d9  results/v2-official/attempt-a76714bbf76f4965aaea9c03241c8737.json
+d564d6a32de43e7c869bdb6814747a15983e94ec128f707add513bf2a7879797  results/v2-official/attempt-a84612ed4fda43c29a4ebde58c2a5551.json
+ead7e0b2b79ad29d1f43746d69c5d1718b0f7178c66dd7cbf669bbdf91c00e23  results/v2-official/attempt-c05c694963984cd4b0793e16ae84d0e4.json
+1c73197d569af03c8979d32b638eb8c7c9e90cb5c4a0fac5475e6c2d2c7b4d58  results/v2-official/attempt-ff98a85ca1a941dd822df0e5ef83f1a6.json
+6fb79e8e029b708490242e7fad5046faeb85de334d4748f0c84dd4c748302688  results/v2-official/summary-18cd5dd068124ae38962211a4bce2b0f.json
+70a7f930d6c2c6d0ad885dc0ad4e9b3090a6e92d052e241b9c7d9f94fb5e9836  results/v2-official/summary-2c7cdd05a3584f1ea926c28f7f6faaba.json
+```

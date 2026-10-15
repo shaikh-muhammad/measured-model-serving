@@ -1,0 +1,97 @@
+{
+  "mode": "official",
+  "version": "v2",
+  "concurrency": 1,
+  "model_threads": 4,
+  "valid_attempt_files": [
+    "results/v2-official/attempt-ff98a85ca1a941dd822df0e5ef83f1a6.json",
+    "results/v2-official/attempt-96b154b38fe1423d9eb2d1c0d76c7bfe.json",
+    "results/v2-official/attempt-1c27a767a2c94168be97a447e949d3cd.json"
+  ],
+  "statistics": {
+    "p50": {
+      "median": 93.116056,
+      "range": [
+        89.032169,
+        97.797401
+      ]
+    },
+    "p95": {
+      "median": 233.837834,
+      "range": [
+        227.630708,
+        240.739466
+      ]
+    },
+    "p99": {
+      "median": 310.740351,
+      "range": [
+        301.079745,
+        316.840813
+      ]
+    },
+    "throughput_requests_per_second": {
+      "median": 9.01143961923557,
+      "range": [
+        8.841493593215274,
+        9.428665723011349
+      ]
+    },
+    "startup_time_seconds": {
+      "median": 2.686598337,
+      "range": [
+        2.490054628,
+        2.748774862
+      ]
+    },
+    "peak_container_memory": {
+      "median": 300486656,
+      "range": [
+        292913152,
+        302333952
+      ]
+    },
+    "docker_image_size_bytes": {
+      "median": 720020107,
+      "range": [
+        720020107,
+        720020107
+      ]
+    },
+    "server_stage_timings": {
+      "tokenize": {
+        "median_ms": 37.830667500000004,
+        "range_ms": [
+          37.6128955,
+          39.316501
+        ]
+      },
+      "model": {
+        "median_ms": 44.921972,
+        "range_ms": [
+          43.0393685,
+          46.1904855
+        ]
+      },
+      "postprocess": {
+        "median_ms": 0.069153,
+        "range_ms": [
+          0.069152,
+          0.069423
+        ]
+      },
+      "server_total": {
+        "median_ms": 83.060486,
+        "range_ms": [
+          80.94067749999999,
+          88.633931
+        ]
+      }
+    },
+    "peak_memory_measurement_methods": [
+      "cgroup memory.peak",
+      "cgroup memory.peak",
+      "cgroup memory.peak"
+    ]
+  }
+}

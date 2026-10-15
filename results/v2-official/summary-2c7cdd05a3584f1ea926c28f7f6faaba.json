@@ -1,0 +1,97 @@
+{
+  "mode": "official",
+  "version": "v2",
+  "concurrency": 4,
+  "model_threads": 4,
+  "valid_attempt_files": [
+    "results/v2-official/attempt-a84612ed4fda43c29a4ebde58c2a5551.json",
+    "results/v2-official/attempt-a76714bbf76f4965aaea9c03241c8737.json",
+    "results/v2-official/attempt-c05c694963984cd4b0793e16ae84d0e4.json"
+  ],
+  "statistics": {
+    "p50": {
+      "median": 278.551001,
+      "range": [
+        261.315565,
+        282.404815
+      ]
+    },
+    "p95": {
+      "median": 522.090772,
+      "range": [
+        515.48489,
+        546.227027
+      ]
+    },
+    "p99": {
+      "median": 625.35203,
+      "range": [
+        612.040066,
+        668.270409
+      ]
+    },
+    "throughput_requests_per_second": {
+      "median": 13.519012621450953,
+      "range": [
+        13.394471101520162,
+        14.155556234484974
+      ]
+    },
+    "startup_time_seconds": {
+      "median": 3.24632113,
+      "range": [
+        2.643636291,
+        3.353619865
+      ]
+    },
+    "peak_container_memory": {
+      "median": 323043328,
+      "range": [
+        321101824,
+        324096000
+      ]
+    },
+    "docker_image_size_bytes": {
+      "median": 720020107,
+      "range": [
+        720020107,
+        720020107
+      ]
+    },
+    "server_stage_timings": {
+      "tokenize": {
+        "median_ms": 82.341829,
+        "range_ms": [
+          79.2288755,
+          83.188111
+        ]
+      },
+      "model": {
+        "median_ms": 103.0481875,
+        "range_ms": [
+          102.1209915,
+          105.4840125
+        ]
+      },
+      "postprocess": {
+        "median_ms": 0.0685885,
+        "range_ms": [
+          0.067302,
+          0.0686335
+        ]
+      },
+      "server_total": {
+        "median_ms": 201.814199,
+        "range_ms": [
+          191.31696349999999,
+          203.0886645
+        ]
+      }
+    },
+    "peak_memory_measurement_methods": [
+      "cgroup memory.peak",
+      "cgroup memory.peak",
+      "cgroup memory.peak"
+    ]
+  }
+}
