@@ -167,3 +167,25 @@ Preserved original summaries:
 - `results/v0-baseline/summary-a05f97da5df344699b971f7ca96088f9.json`
 
 All six attempts and both summaries passed coverage, schema, configuration, provenance, and statistics checks. Docker reported no remaining containers after each setting. Original diagnostic evidence, runner, thresholds, and dataset remain unchanged. No v1/v2 comparison or KEEP/REJECT decision was made.
+
+## v1 service integration
+
+`measured-model-serving:v1` is a verified linux/arm64 Python 3.14.4 image using ONNX Runtime 1.31.0 and the standalone tokenizer. Docker reports **983,250,492 bytes**. PyTorch, Transformers, NVIDIA/CUDA packages and GPU libraries, and Triton are absent. The image preserves UID/GID 10001, four model threads, one worker, and the frozen runner's `src.app:app` entry point by copying `src/app_v1.py` to that path inside the image.
+
+A network-isolated container passed `/health`, the v0 response contract, all ten saved-v0 prediction comparisons, input validation, Unicode/emoji, and 256/257-token boundary checks with 4 CPUs and 2 GiB RAM. The temporary container was removed. Local checks passed 31 v1 tests and 143 combined regression tests. Detailed evidence is in `results/checks/v1-container.json`. **v1 official benchmarks have NOT been run**; image size and smoke-test response timings do not establish a performance improvement.
+
+Reproduce from the project root with the existing Docker group:
+
+```bash
+source scripts/env.sh
+tar -cf - Dockerfile.v1 requirements-v1.txt src/onnx_backend.py src/app_v1.py scripts/verify_tokenizer.py | sg docker -c 'docker buildx build --platform linux/arm64 --pull=false --build-context model=./model-cache/v1 --load --progress plain -f Dockerfile.v1 -t measured-model-serving:v1 -'
+PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS='-p no:cacheprovider' python -m pytest tests/test_v1_service.py -v --basetemp=/home/sm/Projects/.pytest-tmp-measured-model-serving
+```
+
+## v2 signed 8-bit integration
+
+The corrected model uses MatMul-only dynamic `QuantType.QInt8` quantization: **38 signed INT8 MatMul weights**, with **two original FLOAT32 embedding tables preserved**. Its size is **138,876,833 bytes**, SHA-256 `c488916e50d340cd86ee5740bdf1522ec0fc7245a51f8755f50334398363ec51`. The saved correctness checks show **100% label agreement with v0 and v1 on all 1,000 sentences at batch sizes 1 and 4**, with zero disagreements in every length bucket. Evidence: `results/parity/v2-quantization.json`. The rejected original mixed-weight attempt remains preserved in `model-cache/v2/default-mixed-weight.onnx` and `results/parity/v2-quantization-default-failure.json`.
+
+`measured-model-serving:v2` is a Python 3.14.4 linux/arm64 image, **720,020,107 bytes**, using the unchanged v1 CPU dependency pins and standalone tokenizer. PyTorch, Transformers, NVIDIA/CUDA packages and GPU libraries, and Triton are absent. A minimal v2 identity adapter preserves startup hash verification while reusing the existing backend's inference and tokenizer implementation. The image retains UID/GID 10001, four model threads, one worker, and the frozen runner's `src.app:app` entry point.
+
+The network-isolated container passed health, all ten saved-v0/v2 prediction comparisons, the unchanged public response schema, input validation, Unicode/emoji, and exact 256/257-token boundaries under 4 CPUs and 2 GiB RAM. Its temporary container was removed. The v2 service/quantization suite passed **52 tests** (33 service tests); the combined regression suite passed **195 tests**. Container evidence, package inventory, commands, and warnings are in `results/checks/v2-container.json`. **Official v2 performance benchmarks have NOT run**; no speed improvement or performance acceptance decision has been established.

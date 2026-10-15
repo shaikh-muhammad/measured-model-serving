@@ -1,0 +1,28 @@
+FROM python:3.14.4-slim-bookworm@sha256:fc74d22ffd0d5ac395a4b7bdda75a4539758862c49ebf3005647084631e63789
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HUB_OFFLINE=1 \
+    HF_HUB_DISABLE_TELEMETRY=1 \
+    HF_HUB_DISABLE_IMPLICIT_TOKEN=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    MODEL_DIR=/app/model \
+    MODEL_THREADS=4
+
+WORKDIR /app
+COPY requirements-v1.txt /app/requirements-v1.txt
+RUN python -m pip install --only-binary=:all: --no-deps -r requirements-v1.txt \
+    && python -m pip check
+RUN groupadd --gid 10001 serving \
+    && useradd --uid 10001 --gid serving --no-create-home --home-dir /app serving
+COPY src/app_v2.py /app/src/app.py
+COPY src/app_v1.py /app/src/app_v1.py
+COPY src/onnx_backend.py /app/src/onnx_backend.py
+COPY src/onnx_backend_v2.py /app/src/onnx_backend_v2.py
+COPY scripts/verify_tokenizer.py /app/scripts/verify_tokenizer.py
+COPY --from=v2model model.onnx /app/model/model.onnx
+COPY --from=tokenizer tokenizer.json /app/model/tokenizer.json
+USER 10001:10001
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
