@@ -40,8 +40,8 @@ jobs:
           PY
       - run: python -m pip check
       - name: Prepare approved pytest temporary directory
-        run: sudo install -d -o "$(id -u)" -g "$(id -g)" /home/sm/Projects/.pytest-tmp-measured-model-serving
+        run: mkdir -p "$RUNNER_TEMP/measured-model-serving-pytest"
       - name: Offline data, saved evidence, validity and mocked reproduction tests
-        run: python -m pytest tests/test_data.py tests/test_report.py tests/test_bench.py tests/test_reproduction.py -v --basetemp=/home/sm/Projects/.pytest-tmp-measured-model-serving
+        run: python -m pytest tests/test_data.py tests/test_report.py tests/test_bench.py tests/test_reproduction.py -v --basetemp="$RUNNER_TEMP/measured-model-serving-pytest"
       - name: Verify report freshness without regeneration
         run: python bench/report.py --check
