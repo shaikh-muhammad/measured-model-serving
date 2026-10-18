@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="510" viewBox="0 0 840 510" role="img" aria-labelledby="title description">
+<title id="title">Official p99 latency — concurrency 4</title>
+<desc id="description">Three-run median client p99 latency in milliseconds. Whiskers show original three-run minimum to maximum. Lower latency is better.</desc>
+<rect width="840" height="510" fill="white"/>
+<g font-family="sans-serif" fill="#172b4d">
+<text x="420" y="35" text-anchor="middle" font-size="23">Official p99 latency — concurrency 4</text>
+<text x="420" y="62" text-anchor="middle" font-size="15">Three-run medians; whiskers: min–max. Lower is better.</text>
+<text transform="translate(25 260) rotate(-90)" text-anchor="middle" font-size="16">p99 latency (ms)</text>
+<path d="M85 400.000 H800" stroke="#d6dce5"/>
+<text x="75" y="405.000" text-anchor="end" font-size="14">0</text>
+<path d="M85 358.571 H800" stroke="#d6dce5"/>
+<text x="75" y="363.571" text-anchor="end" font-size="14">200</text>
+<path d="M85 317.143 H800" stroke="#d6dce5"/>
+<text x="75" y="322.143" text-anchor="end" font-size="14">400</text>
+<path d="M85 275.714 H800" stroke="#d6dce5"/>
+<text x="75" y="280.714" text-anchor="end" font-size="14">600</text>
+<path d="M85 234.286 H800" stroke="#d6dce5"/>
+<text x="75" y="239.286" text-anchor="end" font-size="14">800</text>
+<path d="M85 192.857 H800" stroke="#d6dce5"/>
+<text x="75" y="197.857" text-anchor="end" font-size="14">1000</text>
+<path d="M85 151.429 H800" stroke="#d6dce5"/>
+<text x="75" y="156.429" text-anchor="end" font-size="14">1200</text>
+<path d="M85 110.000 H800" stroke="#d6dce5"/>
+<text x="75" y="115.000" text-anchor="end" font-size="14">1400</text>
+<rect x="145" y="195.481" width="120" height="204.519" fill="#315b8a"/>
+<path d="M205 196.273 V186.936 M190 196.273 H220 M190 186.936 H220" stroke="#101820" stroke-width="2"/>
+<text x="205" y="172.936" text-anchor="middle" font-size="16">987.331188</text>
+<text x="205" y="430" text-anchor="middle" font-size="17">v0 PyTorch</text>
+<text x="205" y="454" text-anchor="middle" font-size="13">983.507651–1028.586478 ms</text>
+<rect x="380" y="144.519" width="120" height="255.481" fill="#85531a"/>
+<path d="M440 148.651 V136.556 M425 148.651 H455 M425 136.556 H455" stroke="#101820" stroke-width="2"/>
+<text x="440" y="122.556" text-anchor="middle" font-size="16">1233.355484</text>
+<text x="440" y="430" text-anchor="middle" font-size="17">v1 ONNX</text>
+<text x="440" y="454" text-anchor="middle" font-size="13">1213.410183–1271.798754 ms</text>
+<rect x="615" y="270.463" width="120" height="129.537" fill="#21705b"/>
+<path d="M675 273.220 V261.573 M660 273.220 H690 M660 261.573 H690" stroke="#101820" stroke-width="2"/>
+<text x="675" y="247.573" text-anchor="middle" font-size="16">625.352030</text>
+<text x="675" y="430" text-anchor="middle" font-size="17">v2 signed INT8</text>
+<text x="675" y="454" text-anchor="middle" font-size="13">612.040066–668.270409 ms</text>
+</g>
+</svg>

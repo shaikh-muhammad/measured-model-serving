@@ -1,24 +1,47 @@
-name: Model-free data tests
-on:
+name: Offline evidence and workflow tests
+"on":
   pull_request:
 permissions:
   contents: read
 jobs:
-  data:
+  offline:
     runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTEST_ADDOPTS: '-p no:cacheprovider'
+      HF_HUB_OFFLINE: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TRANSFORMERS_OFFLINE: '1'
+      TMPDIR: ${{ github.workspace }}/tmp
+      PIP_CACHE_DIR: ${{ github.workspace }}/.pip-cache
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Saved runner provenance references earlier commits.
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14.4'
-      - run: python -m pip install --only-binary=:all: --no-deps -r requirements-ci.lock
+      - run: mkdir -p "$TMPDIR" "$PIP_CACHE_DIR"
+      - run: >-
+          python -m pip install --only-binary=:all: --no-deps -r requirements-ci.lock
+      - name: Install only offline-test dependencies from existing development pins
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import sys
+          names = {'httpx', 'httpcore', 'certifi', 'h11', 'idna', 'anyio', 'typing-extensions', 'pyyaml'}
+          pins = [line for line in Path('requirements-dev.lock').read_text().splitlines()
+                  if line.split('==')[0].lower().replace('_', '-') in names]
+          assert len(pins) == len(names) and all('==' in pin for pin in pins)
+          subprocess.run([sys.executable, '-m', 'pip', 'install', '--only-binary=:all:', '--no-deps', *pins], check=True)
+          PY
       - run: python -m pip check
       - name: Prepare approved pytest temporary directory
         run: sudo install -d -o "$(id -u)" -g "$(id -g)" /home/sm/Projects/.pytest-tmp-measured-model-serving
-      - name: Offline data tests
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-          PYTEST_ADDOPTS: '-p no:cacheprovider'
-          HF_HUB_OFFLINE: '1'
-          HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
-        run: python -m pytest tests/test_data.py -v --basetemp=/home/sm/Projects/.pytest-tmp-measured-model-serving
+      - name: Offline data, saved evidence, validity and mocked reproduction tests
+        run: python -m pytest tests/test_data.py tests/test_report.py tests/test_bench.py tests/test_reproduction.py -v --basetemp=/home/sm/Projects/.pytest-tmp-measured-model-serving
+      - name: Verify report freshness without regeneration
+        run: python bench/report.py --check

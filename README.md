@@ -1,5 +1,197 @@
 # Measured Model Serving
 
+A reproducible CPU-only sentiment-classification service comparing PyTorch, ONNX Runtime, and signed 8-bit dynamic quantization.
+
+**At concurrency 4, signed INT8 reduced median p99 latency from 987.33 ms to 625.35 ms (36.66% improvement), with 100% matching labels on the fixed 1,000-sentence dataset.** Unquantized ONNX was 24.92% slower at p99 and was rejected.
+
+Official concurrency-4 results, each the median of three valid run-level statistics:
+
+| Version | p50 (ms) | p95 (ms) | p99 (ms) | Requests/s | Peak container memory (bytes) | Docker image size (bytes) | Label agreement with original v0 | Decision |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| v0 PyTorch | 367.973152 | 859.620583 | 987.331188 | 9.467402 | 527626240 | 2106058478 | Reference | **BASELINE** |
+| v1 ONNX | 402.820539 | 985.267498 | 1233.355484 | 8.510558 | 549056512 | 983250492 | 100% | **REJECT** |
+| v2 signed INT8 | 278.551001 | 522.090772 | 625.352030 | 13.519013 | 323043328 | 720020107 | 100% | **KEEP** |
+
+Decisions apply to this registered experiment on this VM. Memory is the container's **cgroup memory.peak**, including startup and warm-ups; image size is Docker's built-image size. Both columns use exact bytes (MiB, where used in the detailed report, means bytes / 1,048,576). Agreement is **6,000/6,000 HTTP labels per candidate across six runs**, with no mismatches in any length bucket; it is not human-labeled accuracy.
+
+```text
+Client HTTP request → FastAPI validation → Tokenizer → Model runtime
+  Build-time runtime: v0 PyTorch / Transformers
+                      v1 ONNX Runtime CPU
+                      v2 ONNX Runtime CPU + signed INT8 MatMul quantization
+Model runtime → Label, score and stage timings → HTTP response
+```
+
+[Inspect the full results](docs/benchmark_report.md) · [Reproduce the saved-data report](#reproduce-the-saved-data-report) · [Service API](#service-api) · [Historical evidence](#historical-evidence)
+
+![Official concurrency-4 p99 latency comparison](docs/p99_by_version.svg)
+
+Concurrency-4 p99, median of three valid repetitions, calculated from saved original observations. Whiskers show minimum–maximum; lower is better. The [detailed report](docs/benchmark_report.md) includes both concurrency settings, all medians and ranges, startup times, server stages, variation disclosures, and original JSON references.
+
+## Architecture and engineering choices
+
+The service classifies English sentiment with the pinned `distilbert/distilbert-base-uncased-finetuned-sst-2-english` model at revision `714eb0fa89d2f80546fda750413ed43d93601a13`. All versions share one HTTP contract, one non-root Uvicorn worker, four model threads, four CPUs and a 2-GiB container limit. Runtime selection happens when building the image. Requests are handled individually; there is no dynamic batching or GPU inference.
+
+- **v0:** the original pinned classifier with CPU PyTorch 2.14.1+cpu and Transformers 5.19.0. [Dockerfile](Dockerfile), [service](src/app.py), [official baseline](results/v0-baseline/).
+- **v1:** legacy `torch.onnx.export` with `dynamo=False`, opset 17, and dynamic batch/sequence axes. ONNX Runtime 1.31.0 uses the CPU execution provider and a standalone tokenizers 0.23.3 artifact. PyTorch and Transformers are absent from the runtime image. Export and tokenizer parity passed; preserved predictions did not translate into passing concurrency-4 performance. [Exporter](scripts/export_onnx.py), [tokenizer verification](scripts/verify_tokenizer.py), [export evidence](results/parity/v1-export.json), [tokenizer evidence](results/parity/v1-tokenizer.json), [container evidence](results/checks/v1-container.json), [Dockerfile.v1](Dockerfile.v1).
+- **v2:** the verified v1 model transformed by ONNX Runtime's `quantize_dynamic`, with `weight_type=QuantType.QInt8` and `op_types_to_quantize=["MatMul"]`. The graph has **38 signed INT8 matrix weights and 38 quantized MatMul operations**. Two embedding tables retain their original FLOAT32 values; there are no unsigned quantized model weights. Dynamic activations can use UINT8, so this is not an entirely 8-bit model. [Quantizer](scripts/quantize_onnx.py), [corrected quantization evidence](results/parity/v2-quantization.json), [container evidence](results/checks/v2-container.json), [Dockerfile.v2](Dockerfile.v2).
+
+The first default quantization attempt produced 38 INT8 matrix weights and two UINT8 embedding weights. It failed the signed-weight requirement before inference; label quality was not evaluated. Its [rejected implementation evidence](results/parity/v2-quantization-default-failure.json) and ignored cached model were preserved. The official v2 experiment uses only the corrected MatMul-only model.
+
+## Registered experiment design
+
+The [committed thresholds](bench/thresholds.yaml) were registered before any performance run, including the thread diagnostic, so optimized measurements could not determine their own acceptance rules. The [runner](bench/run_load.py) was frozen before official v0 measurement and reused unchanged across versions.
+
+- **p99:** tail latency captures slow requests that a typical-request median can hide. Each run uses all 1,000 fixed IDs, giving a reproducible nearest-rank p99 at sorted observation 990; p50 and p95 use observations 500 and 950. No interpolated percentiles are used.
+- **Warm-up and coverage:** 100 separate successful warm-ups precede each measured run and are excluded from latency statistics, throughput and label comparison. Every measured ID must succeed exactly once, in the same seeded order. This separates warm-up effects and holds workload composition fixed.
+- **Concurrency and repetitions:** concurrency 1 exposes serial behavior; concurrency 4 is the primary workload within the four-CPU limit. Three valid repetitions per setting support a median and minimum–maximum range rather than a single timing.
+- **Threads:** the v0-only 4/2/1-thread diagnostic selected four threads. That count was frozen for every runtime to avoid separately tuning ONNX to favor a result. The original scores and selection arithmetic remain in the historical evidence below.
+
+Let `B` be the median of the three original concurrency-4 v0 p99 values, `C` the candidate median, `I=(B-C)/B`, and `S=(max(v0 p99)-min(v0 p99))/B`. The rules require:
+
+1. `I >= 0.20` **and** `I > S` for performance PASS.
+2. At least 990 of the fixed 1,000 IDs matching v0 labels: **99% label agreement**.
+3. All mandatory validity, correctness and parity checks for KEEP. Any failed request, including a warm-up failure, or missing/inconsistent mandatory evidence invalidates an attempt.
+
+If `I >= 0.20` but `I <= S`, performance is INCONCLUSIVE. Performance FAIL or quality below 99% takes REJECT precedence; passing quality with inconclusive performance remains INCONCLUSIVE. Unresolved mandatory failures prevent KEEP. Invalid attempts are preserved and excluded, with at most two retries of the same run slot; exhaustion stops benchmarking. Same-version variation strictly above 10% must be disclosed, without replacing valid noisy runs. Concurrency 1 is reported fully and does not decide acceptance.
+
+The original baseline spread is **4.565725% (about 4.57%)**. V1's **−24.918112% improvement** means its p99 is about 24.92% worse, so **REJECT**. V2's **36.662385% improvement** exceeds both the 20% minimum and the baseline spread; quality and mandatory checks pass, so **KEEP for this experiment**. Neither candidate is inconclusive. The [report's variation disclosures](docs/benchmark_report.md#variation-disclosures) and the historical warnings retain all observed variation above 10%.
+
+## Reproduce the saved-data report
+
+Reading [the Markdown report](docs/benchmark_report.md), [SVG](docs/p99_by_version.svg), and committed JSON requires no model, Docker or network. Regenerating the report reads saved data; it does not rerun the performance experiment.
+
+The measured environment was an ARM64 Ubuntu 26.04.1 VM with Python **3.14.4**. A clean clone needs a project-local `.venv` prepared before these commands. For saved-data analysis and offline tests, use the pytest pins in [requirements-ci.lock](requirements-ci.lock) plus the eight httpx/PyYAML dependency pins selected from [requirements-dev.lock](requirements-dev.lock) by [CI](.github/workflows/ci.yml); model libraries are unnecessary. Installing those packages needs package-index access unless their wheels are cached. Offline test execution is separate from that bootstrap.
+
+For model preparation and full local tests, use the pinned development inventory, installing CPU-only PyTorch first from `https://download.pytorch.org/whl/cpu` with binary wheels; do not install NVIDIA, CUDA or Triton packages. No API key, Hugging Face token or GPU is required. `scripts/env.sh` activates the existing `.venv` and directs `TMPDIR` to the project's `tmp/` and `PIP_CACHE_DIR` to `.pip-cache/` on the main disk. It does not create the virtual environment or install packages. Source it before Python tools; do not use `/tmp` for heavyweight work.
+
+From the project root, inspect Git state and verify the saved report without writing:
+
+```bash
+git status --short --branch --untracked-files=all
+git rev-parse HEAD
+source scripts/env.sh
+PYTHONDONTWRITEBYTECODE=1 python bench/report.py --check
+```
+
+To refresh only the two generated report outputs, use the implemented `make report` target, equivalent to `source scripts/env.sh && PYTHONDONTWRITEBYTECODE=1 python bench/report.py`. It requires the existing Python environment, including httpx and PyYAML imported by the frozen helper module; no model packages are loaded and no new dependency is downloaded.
+
+`make test` is the offline suite: synthetic-data generation with a fake tokenizer, saved-report validation, benchmark validity, and mocked reproduction safety. It needs neither ignored artifacts nor Docker. Its expanded command is:
+
+```bash
+source scripts/env.sh
+PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS='-p no:cacheprovider' \
+  python -m pytest tests/test_data.py tests/test_report.py tests/test_bench.py tests/test_reproduction.py -v \
+  --basetemp=/home/sm/Projects/.pytest-tmp-measured-model-serving
+```
+
+The absolute pytest base directory is the project's approved main-disk location on this VM. Do not replace it with `/tmp`. The expanded offline target and the local CI-equivalent command each passed **108 tests**: 9 data, 18 report, 53 benchmark-validity and 28 reproduction-safety tests. `make test-local` first runs this offline subset, verifies all cached artifact identities, then runs all existing service, tokenizer, ONNX parity and quantization test files. That separate target requires the full development environment and verified v0/v1/v2 artifacts and performs real local inference; it was not executed in this engineering-hygiene check.
+
+### Rebuilding artifacts and services
+
+This is a separate operation requiring Docker with a usable local Docker group, the pinned packages, and locally cached artifacts under ignored `model-cache/`. `make setup` can prepare the four pinned original model files anonymously; its initial preparation needs network access. For an already populated cache, `scripts/prepare_model.py --local-only` verifies/prepares them without downloads. Model services load only local files. Dataset generation uses the local pinned tokenizer and seed `20261010`; it refuses to overwrite different dataset bytes.
+
+| Make target | Current implementation and limits |
+| --- | --- |
+| `make setup` | Original model preparation; anonymous download when needed. |
+| `make data` | Offline deterministic dataset generation/validation using the pinned local tokenizer. |
+| `make build VERSION=v0` | Verify cached v0 files, then ARM64 build from `Dockerfile`. VERSION defaults to v0. |
+| `make build VERSION=v1` / `VERSION=v2` | Verify the selected cached model/tokenizer hashes, then build the actual optimized Dockerfile with the saved tar-input method and required BuildKit named artifact contexts. Missing caches fail with preparation guidance. |
+| `make run VERSION=v0` / `v1` / `v2` | Verify artifacts and the recorded image ID, then run that exact ID on `127.0.0.1:8000`, four CPUs, 2 GiB, UID/GID 10001, four model threads and the image's one-worker command. No pull. |
+| `make bench` | Sequential frozen-runner orchestration for all three versions and both concurrency settings, using existing verified local images/artifacts. Default output: NEW `tmp/reproductions/official/`. No artifact preparation or build is implicit. |
+| `make report` | Implemented offline saved-data Markdown/SVG generation. |
+| `make test` | Model-free offline data, report, benchmark-validity and mocked-reproduction tests. |
+| `make test-local` | Offline suite followed by all existing local service/parity tests; needs cached verified artifacts and model-runtime dependencies. |
+
+The [v1 container evidence](results/checks/v1-container.json) and [v2 container evidence](results/checks/v2-container.json) retain the verified build commands. V1 uses `Dockerfile.v1` with BuildKit named context `model=./model-cache/v1`; v2 uses `Dockerfile.v2` with `v2model=./model-cache/v2` and `tokenizer=./model-cache/v1`. Both use explicit source-file tar contexts. These are not interchangeable with a plain v0 `make build`. The original v1 build command is also retained in the history below.
+
+Use `make build VERSION=v1` or `make build VERSION=v2` only after the corresponding verified cache exists. The Docker group must already be usable; if this shell has not inherited membership, the previously used form is `sg docker -c 'make build VERSION=v1'` (similarly for v0/v2 and run). Builds can need package-index/base-image access. A rebuild is not guaranteed to reproduce the historical Docker image ID; run/bench deliberately refuse a changed ID. Restore the verified original image if necessary rather than substituting a different image under its tag.
+
+**Remaining fresh-clone gap:** Git does not contain ignored ONNX models or tokenizer artifacts. Export, tokenizer and quantization scripts retain historical Git/state and output guards; they are not safe fresh-clone end-to-end recipes at the current HEAD. Export/tokenizer scripts refuse existing evidence, and the quantizer requires the verified archived initial failure state. Recreating every artifact from a clean clone would require separately authorized changes to that frozen preparation workflow. This subtask stops at those guards: do not reset history, remove evidence, weaken checks, or rerun the corrective quantization to bypass them. `make setup` prepares only original v0 assets, not the ignored v1/v2 artifacts.
+
+### Rerunning the performance experiment
+
+A full experiment starts services and sends measured HTTP traffic; report generation does neither. With the original verified artifacts and Docker images already present on ARM64 Linux, `make bench BENCH_OUTPUT=tmp/reproductions/new-run` invokes [scripts/reproduce_official.py](scripts/reproduce_official.py). This is an instruction for a future deliberate benchmark run; no benchmark was run during the workflow update.
+
+The orchestrator checks frozen runner/threshold/dataset hashes, committed source provenance, local artifact hashes, and exact original image identities before reserving a nonexistent output directory. It invokes the frozen runner sequentially for v0/c1, v0/c4, v1/c1, v1/c4, v2/c1 and v2/c4: three valid runs each, 100 warm-ups, 1,000 measured requests, seed 20261010, four threads, one worker, four CPUs and 2 GiB. The runner owns measurements and its original INVALID/retry policy. Existing destinations, symlinked destinations and every location outside `tmp/reproductions/` are refused. Partial/INVALID files are retained on failure; completion requires all six saved settings and 18 VALID run slots. No new quality/performance decision or comparison report is inferred from completion alone.
+
+The committed [registration](bench/thresholds.yaml), [runner](bench/run_load.py), [official baseline](results/v0-baseline/), [v1 results](results/v1-official/), and [v2 results](results/v2-official/) remain authoritative original evidence. New reruns never overwrite them. Distinguish **A: saved-data analysis** (`make report`), **B: repeat the protocol from verified local images/artifacts** (`make bench`), and **C: rebuild all artifacts from a fresh clone** (still incomplete). A and B do not establish C. Benchmark orchestration is tested with mocks; no live Docker/benchmark execution is claimed for this update.
+
+### Pull-request CI and local hygiene checks
+
+[CI](.github/workflows/ci.yml) runs on pull requests with `contents: read`, Python 3.14.4, no persisted checkout credentials, and full Git history for saved runner provenance checks. It installs only the existing pytest CI pins and selected existing development pins for httpx, httpcore, certifi, h11, idna, anyio, typing-extensions and PyYAML. It runs `pip check`, the same four-file offline test selection as `make test`, and read-only report freshness verification. Model-hub access is disabled by environment flags; tests use saved data and mocks, without Docker, weights, GPU packages or secrets. Package installation on a fresh GitHub runner still needs package-index access. No GitHub CI run has been triggered or claimed to pass here.
+
+Local read-only checks found no candidate API tokens, passwords, private keys, Authorization values or credential-bearing URLs in the scanned source, workflow and saved evidence. The records contain expected public model IDs, hashes, offline flags and VM path/host metadata; these are not credentials. `.gitignore` excludes virtual environments, `.env*`, model caches and development caches. The v0 Docker context uses an allowlist; optimized builds use explicit source-file tar inputs and named model contexts. Previously saved optimized inventories contain no PyTorch, Transformers or GPU libraries. Local `pip check` passes. This is a local dependency-consistency and secret-pattern check, not a current vulnerability-database audit or a guarantee that no vulnerability exists.
+
+## Service API
+
+With the existing v0 image started by `make run VERSION=v0`, the verified mapping is `http://127.0.0.1:8000`. These are usage examples, not commands needed to inspect the report:
+
+```bash
+curl http://127.0.0.1:8000/health
+curl -X POST http://127.0.0.1:8000/classify \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"The support was helpful."}'
+```
+
+`GET /health` returns `{"status":"ok","version":"v0"}` when ready; v1/v2 identify their respective image version. `POST /classify` accepts the JSON above. The response shape below uses **illustrative placeholders**, not an observed prediction, score or measurement:
+
+```text
+{
+  "label": "<POSITIVE or NEGATIVE>",
+  "score": <number between 0 and 1>,
+  "truncated": <boolean>,
+  "timings_ms": {
+    "tokenize": <milliseconds>, "model": <milliseconds>,
+    "postprocess": <milliseconds>, "server_total": <milliseconds>
+  }
+}
+```
+
+`label` is the predicted sentiment; `score` is its softmax score. `truncated` indicates that the original input exceeded **256 model tokens including special tokens** and was truncated. Stage timings describe tokenization, model inference, postprocessing and handler time through inference before serialization. They are different from complete client-observed latency.
+
+All versions retain the same response contract and support Unicode and emoji inputs. Empty or whitespace-only text returns **422**; text over **2,000 characters** returns **422**. Inputs over 256 model tokens are truncated rather than rejected for token count. Unicode support does not establish multilingual sentiment accuracy.
+
+## What did not help
+
+The unquantized ONNX v1 image is smaller, but its concurrency-4 p99 is worse than the PyTorch baseline. This negative result is retained as **REJECT**. A smaller image may help distribution or storage costs; it does not guarantee faster inference. The stage timings are evidence, not proof of a single causal explanation for the regression.
+
+Quantization changes numerical logits. Corrected v2 preserved all evaluated labels in this experiment and passed the registered gate; that does not establish identical logits or performance on other hardware. The initial mixed signed/unsigned-weight attempt was rejected before inference and remains visible as implementation evidence.
+
+## Limitations
+
+- One ARM64 Ubuntu VM under UTM, four available CPU cores, and shared VM scheduling noise. Client and server ran on the same VM.
+- Only three repetitions per setting. The v0 baseline was measured on October 12, 2026, while optimized versions were measured on October 14, 2026 (America/New_York); host-load differences remain possible.
+- A fixed synthetic 1,000-sentence dataset, one small English sentiment model, and no real production traffic. Observed label agreement is not accuracy against human ground-truth labels.
+- Registered variability warnings include v1 concurrency-1 p99 above 10%, plus memory, startup and tokenizer-stage variation. All warnings and ranges remain in the [detailed report](docs/benchmark_report.md#variation-disclosures) and historical evidence.
+- Results may differ on x86 CPUs, other machines, or different traffic. KEEP/REJECT is specific to this registered VM experiment and is not a universal production guarantee.
+
+## Dependencies, licences and provenance
+
+Runtime inventories are pinned in [requirements-v0.lock](requirements-v0.lock) and [requirements-v1.txt](requirements-v1.txt), with CPU PyTorch pinned separately in [Dockerfile](Dockerfile). V2 reuses v1's runtime pins. Both optimized images exclude PyTorch/Transformers. Shared runtime pins include FastAPI 0.143.0, Uvicorn 0.54.0, NumPy 2.5.4 and tokenizers 0.23.3. [requirements-dev.lock](requirements-dev.lock) records the development environment, including ONNX 1.23.2, ONNX Runtime 1.31.0, httpx 0.28.1 and PyYAML 6.0.3; [requirements-ci.lock](requirements-ci.lock) is the smaller model-free data-test inventory. Pinned Python base-image and model-file identities remain in the historical record.
+
+Licence checks here use installed distribution `METADATA` and bundled licence files, read without importing model runtimes:
+
+| Component | Local licence evidence and outcome |
+| --- | --- |
+| Repository | Project-owned code is licensed under the complete root [MIT LICENSE](LICENSE), copyright 2026 Measured Model Serving contributors. This does not relicense model weights or third-party libraries. |
+| Pinned DistilBERT model | Source and immutable revision are recorded above and in [prepare_model.py](scripts/prepare_model.py). The historical pinned-revision metadata check recorded **Apache-2.0**; that original statement and source link are retained below. No model card/licence metadata is cached locally, so independent offline re-verification remains outstanding. |
+| PyTorch 2.14.1+cpu | Bundled PyTorch/Caffe2 licence and distribution metadata. The wheel declares `Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT`; bundled third-party terms must also be retained. |
+| Transformers 5.19.0 | `METADATA` declares Apache 2.0 License; bundled licence confirms Apache License Version 2.0. |
+| ONNX Runtime 1.31.0 | `METADATA` and bundled `onnxruntime/LICENSE` declare MIT. |
+| FastAPI 0.143.0 | `METADATA` licence expression and bundled licence declare MIT. |
+| tokenizers 0.23.3 | The supplied upstream reference identifies the [v0.23.3 repository LICENSE](https://github.com/huggingface/tokenizers/blob/v0.23.3/LICENSE) as Apache License 2.0. Installed-wheel `METADATA` only classifies Apache Software License and omits the exact version/text. Upstream repository evidence and installed-wheel metadata are distinct; no network re-fetch was performed in this offline review. |
+| Other material runtime dependencies | Local metadata: Uvicorn 0.54.0 and Starlette 1.7.0 declare BSD-3-Clause; Pydantic 2.14.0, anyio 4.15.1 and PyYAML 6.0.3 declare MIT. NumPy 2.5.4 declares `BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0`; its bundled components retain their own notices. |
+
+The dataset is project-generated synthetic feedback from fixed templates in [data/make_sentences.py](data/make_sentences.py), seed `20261010`: 400 short, 400 medium and 200 long inputs, with no human ground-truth sentiment labels or production-user text. Its SHA-256 is `bfe687d4cff16e7d06e8580d09b5947760095b2829fceb0ac9b5fc7f70a99be0`. Third-party model/library licences remain separate from the project's MIT licence. No external accounts, downloads or credentials were used for this engineering-hygiene update. The exact historical model-revision licence remains the unresolved provenance item described above.
+
+## Historical evidence
+
+The complete prior README is preserved below, including registration, diagnostic selection, run-level figures/ranges, variation warnings, container checks, failed implementation evidence, result paths, and the original 16-file SHA-256 manifest. Its setup and integration notes describe their historical stages; statements such as “planned”, “not run”, and “placeholder” are not current project status. Use the overview and current workflow table above for completed outcomes and remaining gaps.
+
+<details>
+<summary>Expand the original experiment record and SHA-256 manifest</summary>
+
 Measuring and optimizing CPU-only sentiment classification without changing predicted labels unnecessarily.
 
 Model: `distilbert-base-uncased-finetuned-sst-2-english`. Verified model revision, licence, and Docker base-image digest are recorded below.
@@ -306,3 +498,5 @@ ead7e0b2b79ad29d1f43746d69c5d1718b0f7178c66dd7cbf669bbdf91c00e23  results/v2-off
 6fb79e8e029b708490242e7fad5046faeb85de334d4748f0c84dd4c748302688  results/v2-official/summary-18cd5dd068124ae38962211a4bce2b0f.json
 70a7f930d6c2c6d0ad885dc0ad4e9b3090a6e92d052e241b9c7d9f94fb5e9836  results/v2-official/summary-2c7cdd05a3584f1ea926c28f7f6faaba.json
 ```
+
+</details>
