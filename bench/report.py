@@ -361,8 +361,339 @@ def svg(e):
     return '\n'.join(lines) + '\n'
 
 
+
+# Portfolio outputs remain derived from the validated original attempts.
+# The renderer is imported only by render_graphics(), never by outputs()/--check.
+PALETTE = {"background": "#f6f5f2", "dark": "#14151a", "secondary": "#5b5d66",
+           "teal": "#0b8f80", "teal_tint": "#e6f5f2", "orange": "#c96a0a",
+           "orange_tint": "#fdf0e2", "grey": "#6b6e7a", "grey_tint": "#eeeef1"}
+GRAPHICS = ("docs/result-cards.png", "docs/typical-vs-slowest.png")
+FONT = "DejaVu Sans"  # Inter is not installed on the authoring machine.
+RENDERER_VERSION = "3.11.2"
+
+
+def portfolio_data(e):
+    """JSON-ready provenance, unrounded medians, display arithmetic and layout."""
+    import hashlib
+    workloads = []
+    definitions = {
+        "p50": ("ms", 1, 0), "p95": ("ms", 1, 0), "p99": ("ms", 1, 0),
+        "throughput_requests_per_second": ("requests/s", 1, 1),
+        "peak_container_memory": ("MB", 1_000_000, 0),
+        "docker_image_size_bytes": ("GB", 1_000_000_000, 1),
+        "startup_time_seconds": ("s", 1, 9),
+    }
+    names = {"v0": "Original", "v1": "New format", "v2": "New format + compression"}
+    descriptions = {"v0": "The starting model", "v1": "Converted, not compressed",
+                    "v2": "Converted and compressed"}
+    sources = []
+    source_index = {}
+    for name in e['sources']:
+        if '/attempt-' in name:
+            attempt = read_json(ROOT / name)
+            source_index[attempt['version'], attempt['concurrency'], attempt['run_slot']] = name
+    for c, label in ((4, "Four requests at the same time"), (1, "One request at a time")):
+        versions = []
+        for v in DIRECTORIES:
+            runs = e["groups"][v, c]["runs"]
+            require(len(runs) == 3 and all(a["validity_status"] == "VALID" for a in runs),
+                    "Portfolio requires three VALID runs")
+            metrics = {}
+            for key, (unit, divisor, digits) in definitions.items():
+                values = [a[key] for a in runs]
+                raw = sorted(values)[1]
+                baseline = sorted(a[key] for a in e["groups"]["v0", c]["runs"])[1]
+                change = (raw - baseline) / baseline * 100
+                display_number = f"{raw / divisor:.{digits}f}"
+                optimum = max if key == "throughput_requests_per_second" else min
+                best = raw == optimum(sorted(a[key] for a in e["groups"][other, c]["runs"])[1]
+                                  for other in DIRECTORIES)
+                good = change > 0 if key == "throughput_requests_per_second" else change < 0
+                metrics[key] = dict(run_values=values, raw_median=raw, baseline=baseline,
+                                    divisor=divisor, digits=digits, unit=unit,
+                                    display_number=display_number, display=f"{display_number} {unit}",
+                                    change_percent=change,
+                                    change_label="original" if v == "v0" else f"{change:+.0f}% vs original",
+                                    change_color="grey" if v == "v0" else "teal" if good else "orange",
+                                    best=best, formula="median of three VALID run-level statistics; no pooling",
+                                    rounding="format fixed point, round half to even; convert units after median")
+            improvement = -metrics["p99"]["change_percent"]
+            badge = "baseline" if v == "v0" else f"{abs(improvement):.0f}% " + (
+                "faster" if improvement > 0 else "slower")
+            decision_name = "BASELINE" if v == "v0" else e["decisions"][v]["outcome"]
+            category = {"BASELINE": "STARTING POINT", "REJECT": "TRIED, REJECTED",
+                        "KEEP": "KEPT", "INCONCLUSIVE": "INCONCLUSIVE"}[decision_name]
+            decision_label = "Starting point" if v == "v0" else (
+                {"KEEP": "Kept", "REJECT": "Rejected", "INCONCLUSIVE": "Inconclusive"}[decision_name]
+                + ": " + badge)
+            versions.append(dict(version=v, name=names[v], description=descriptions[v],
+                                 category=category, badge=badge, decision=decision_name,
+                                 decision_label=decision_label, metrics=metrics,
+                                 agreement=e["quality"][v]))
+            for a in runs:
+                path = source_index[v, c, a["run_slot"]]
+                sources.append(dict(path=path, sha256=hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
+                                    version=v, concurrency=c, run_slot=a["run_slot"]))
+        maximum = max(row["metrics"]["p99"]["raw_median"] for row in versions)
+        for row in versions:
+            row["progress_fraction"] = row["metrics"]["p99"]["raw_median"] / maximum
+        workloads.append(dict(concurrency=c, label=label, versions=versions))
+    data = dict(schema_version=1, sources=sources, workloads=workloads,
+                palette=PALETTE, rendering=dict(font=FONT, font_source="Matplotlib bundled regular and bold fonts",
+                matplotlib=RENDERER_VERSION, dpi=100, png_metadata={"Software": "Measured Model Serving"},
+                dimensions={name: [2200, 1120] for name in GRAPHICS},
+                units={"MB": 1_000_000, "GB": 1_000_000_000, "MiB": 1_048_576},
+                progress_formula="version median p99 / largest version median p99 at four requests"))
+    data["readme"] = portfolio_readme(data)
+    data["graphics"] = portfolio_layout(data)
+    data["labels"] = [label["text"] for graphic in data["graphics"].values() for label in graphic["texts"]]
+    data["image_sha256"] = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+                            for name in GRAPHICS if (ROOT / name).is_file()}
+    return data
+
+
+def portfolio_readme(data):
+    busy, serial = [w["versions"] for w in data["workloads"]]
+    v0, v1, v2 = busy
+    def metric(row, key): return row["metrics"][key]
+    memory_saving = -metric(v2, "peak_container_memory")["change_percent"]
+    outcome = (f'I reduced the delay reached by 99 in 100 requests from about '
+               f'{metric(v0, "p99")["display_number"]} to {metric(v2, "p99")["display_number"]} milliseconds: '
+               f'a {-metric(v2, "p99")["change_percent"]:.0f}% reduction.\n'
+               f'Its measured memory use fell by {memory_saving:.0f}%. These results apply to this computer and workload.')
+    columns = ["Version", "What it is", "Slowest 1% of requests", "Requests per second",
+               "Memory", "Size on disk", "Same answers as original", "Decision"]
+    table = ["| " + " | ".join(columns) + " |", "| " + " | ".join(["---"] * len(columns)) + " |"]
+    exact = ["| Version | p50 ms | p95 ms | p99 ms | Requests/s | Peak memory bytes | Peak memory MiB | Image bytes | Startup seconds | Matching HTTP labels | Decision |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    for row in busy:
+        m = row["metrics"]; v = row["version"]; quality = row["agreement"]
+        same = "Original reference" if v == "v0" else f'Yes, all {quality["unique_ids"]:,} sentences'
+        table.append("| " + " | ".join([v, row["description"], m["p99"]["display"],
+            m["throughput_requests_per_second"]["display_number"], m["peak_container_memory"]["display"],
+            m["docker_image_size_bytes"]["display"], same, row["decision_label"]]) + " |")
+        exact.append("| " + " | ".join([v, *(f'{m[k]["raw_median"]:.6f}' for k in ("p50","p95","p99")), str(m["throughput_requests_per_second"]["raw_median"]),
+            f'{m["peak_container_memory"]["raw_median"]:.0f}', str(m["peak_container_memory"]["raw_median"] / 1048576),
+            f'{m["docker_image_size_bytes"]["raw_median"]:.0f}', f'{m["startup_time_seconds"]["raw_median"]:.9f}',
+            f'{quality["matching"]}/{quality["total"]}', row["decision"]]) + " |")
+    results = (outcome + "\n\n" + "\n".join(table)
+        + "\n\n<details>\n<summary>Exact numbers and units</summary>\n\n"
+        + "\n".join(exact)
+        + "\n\nEach value is the median of three valid run-level values at four simultaneous requests. "
+          "Memory includes startup and warm-ups. MiB means bytes / 1,048,576. "
+          "Size is Docker's built-image size. The full report retains all ranges and timing definitions.\n\n</details>\n\n"
+          "The slowest-1% column is the 99-in-100 timing threshold. Percent faster means a reduction in that delay.\n"
+          "Both other versions matched the original answers for all "
+        + f'{v2["agreement"]["unique_ids"]:,} fixed test sentences across all six runs each. '
+          "Matching answers does not measure accuracy against human labels.")
+    s0, s1, _ = serial
+    comparison = (f'With one request at a time, v1 improved the typical wait from '
+                 f'{metric(s0, "p50")["display_number"]} to {metric(s1, "p50")["display_number"]} milliseconds.\n'
+                 f'Its slowest-1% time was almost unchanged: {metric(s0, "p99")["display_number"]} versus '
+                 f'{metric(s1, "p99")["display_number"]} milliseconds.\n\n'
+                 'With four requests at the same time, v1 was slower at every reported delay point.\n'
+                 'The format change helped when requests came one by one, but not when several arrived together.\n'
+                 'I decided in advance that the busy case decides, so I rejected the format-only version.')
+    rejection = (f'Converting the model to another format made the slowest requests about '
+                 f'{metric(v1, "p99")["change_percent"]:.0f}% slower in the busy test, so I rejected that version.\n'
+                 'Compressing the converted model produced the observed improvement.\n'
+                 'A smaller download did not guarantee a shorter wait.')
+    return dict(results=results, findings=comparison, rejection=rejection)
+
+
+def portfolio_layout(data):
+    """All visible text lives in chart_data.json, with explicit allotted regions."""
+    images = {name: dict(size=[2200, 1120], texts=[], cards=[], tracks=[]) for name in GRAPHICS}
+    def text(image, ident, value, x, y, size, region, color="dark", weight="normal", align="left"):
+        images[image]["texts"].append(dict(id=ident, text=value, x=x, y=y, size=size,
+                                          region=region, color=color, weight=weight, align=align))
+    d1, d3 = GRAPHICS
+    header = [50, 20, 2150, 195]
+    text(d1, "title", "Evaluating CPU Inference Optimizations", 60, 45, 34, header, weight="bold")
+    text(d1, "subtitle", "Four requests at the same time · Middle result of three runs on one computer",
+         60, 125, 22, header, color="secondary")
+    for i, row in enumerate(data["workloads"][0]["versions"]):
+        x = 60 + i * 705
+        region = [x + 22, 250, x + 648, 952]
+        accent = {"v0": "grey", "v1": "orange", "v2": "teal"}[row["version"]]
+        images[d1]["cards"].append(dict(rect=[x, 230, 670, 750], accent=accent,
+                                       border=3 if row["version"] == "v2" else 1))
+        text(d1, f"{i}-category", row["category"], x+28, 265, 13, region, accent, "bold")
+        text(d1, f"{i}-badge", row["badge"], x+626, 265, 14, region, accent, "bold", "right")
+        text(d1, f"{i}-name", row["version"]+" · "+row["name"], x+28, 335, 24, region, weight="bold")
+        text(d1, f"{i}-description", row["description"], x+28, 397, 18, region, "secondary")
+        text(d1, f"{i}-p99", row["metrics"]["p99"]["display"], x+28, 475, 52, region, accent, "bold")
+        text(d1, f"{i}-caption", "slowest 1% of requests", x+28, 575, 18, region, "secondary")
+        images[d1]["tracks"].append(dict(rect=[x+28, 625, 614, 8],
+                                        fraction=row["progress_fraction"], color=accent))
+        for j, (key, label) in enumerate((("throughput_requests_per_second", "Requests per second"),
+                                          ("peak_container_memory", "Memory"),
+                                          ("docker_image_size_bytes", "Size on disk"))):
+            m=row["metrics"][key]; y=710+j*78
+            value=m["display_number"] if key=="throughput_requests_per_second" else m["display"]
+            text(d1, f"{i}-{key}-label", label, x+28, y, 16, region, "secondary")
+            text(d1, f"{i}-{key}-value", value, x+626, y-4, 23, region, weight="bold", align="right")
+            text(d1, f"{i}-{key}-delta", m["change_label"], x+626, y+43, 13, region, m["change_color"], align="right")
+    count=data["workloads"][0]["versions"][2]["agreement"]["unique_ids"]
+    text(d1, "agreement", f"Both other versions gave the same answers as the original on all {count:,} test sentences.",
+         60, 1035, 19, [50, 1010, 2150, 1100], "secondary")
+    text(d3, "title", "Typical, slow and slowest", 60, 45, 34, header, weight="bold")
+    text(d3, "subtitle", "Typical = middle request · Slow = 95 in 100 · Slowest = 99 in 100",
+         60, 125, 22, header, "secondary")
+    for i, workload in enumerate(data["workloads"]):
+        x=60+i*1080; region=[x+22, 250, x+998, 960]
+        images[d3]["cards"].append(dict(rect=[x,230,1020,750],accent="grey",border=1))
+        text(d3,f"{i}-workload",workload["label"],x+30,270,24,region,weight="bold")
+        text(d3,f"{i}-qualifier","the main test" if i==0 else "the quieter test",
+             x+30,322,17,region,"secondary")
+        for col,(key,label) in enumerate((("p50","Typical\nrequest"),("p95","Slow\nrequest"),("p99","Slowest 1%\nof requests"))):
+            cx=x+255+col*290
+            text(d3,f"{i}-{key}-heading",label,cx,405,18,region,"secondary",align="center")
+            for j,row in enumerate(workload["versions"]):
+                y=535+j*140; m=row["metrics"][key]
+                if col==0: text(d3,f"{i}-{j}-version",row["version"],x+32,y+6,22,region,weight="bold")
+                text(d3,f"{i}-{j}-{key}-value",m["display"],cx,y,32,region,
+                     "teal" if m["best"] else "dark","bold" if m["best"] else "normal","center")
+                if m["best"]:text(d3,f"{i}-{j}-{key}-best","best",cx,y+68,13,region,"teal","bold","center")
+    text(d3,"method","Each cell is the middle of three run-level measurements · Lower times are better",
+         60,1035,19,[50,1010,2150,1100],"secondary")
+    return images
+
+
+def render_graphics(data):
+    """Development-only, deterministic PNG rendering and measured text geometry."""
+    import io
+    import matplotlib
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+    from matplotlib.figure import Figure
+    from matplotlib.font_manager import FontProperties, findfont
+    from matplotlib.patches import FancyBboxPatch
+    require(matplotlib.__version__ == RENDERER_VERSION, "Install the pinned development renderer")
+    images, geometry = {}, {}
+    with matplotlib.rc_context({"font.family": FONT, "text.antialiased": True,
+                                "text.usetex": False, "svg.hashsalt": "measured-model-serving"}):
+        for name, layout in data["graphics"].items():
+            w,h=layout["size"]
+            figure=Figure(figsize=(w/100,h/100),dpi=100,facecolor=PALETTE["background"])
+            canvas=FigureCanvasAgg(figure)
+            ax=figure.add_axes([0,0,1,1]);ax.set(xlim=(0,w),ylim=(h,0));ax.axis("off")
+            for card in layout["cards"]:
+                x,y,cw,ch=card["rect"];accent=card["accent"]
+                ax.add_patch(FancyBboxPatch((x,y),cw,ch,boxstyle="round,pad=0,rounding_size=22",
+                             facecolor="white",edgecolor=PALETTE[accent] if card["border"]>1 else "#dedee2",
+                             linewidth=card["border"]))
+                if name==GRAPHICS[0]:
+                    ax.plot([x+28,x+cw-28],[665,665],color="#e4e4e8",linewidth=1)
+                    ax.add_patch(FancyBboxPatch((x+440,251),195,45,
+                                 boxstyle="round,pad=0,rounding_size=18",
+                                 facecolor=PALETTE[accent+"_tint"],edgecolor="none"))
+            for track in layout["tracks"]:
+                x,y,cw,ch=track["rect"]
+                for fraction,color in ((1,"grey_tint"),(track["fraction"],track["color"])):
+                    ax.add_patch(FancyBboxPatch((x,y),cw*fraction,ch,boxstyle="round,pad=0,rounding_size=4",
+                                              facecolor=PALETTE[color],edgecolor="none"))
+            artists=[]
+            for label in layout["texts"]:
+                font=FontProperties(family=FONT,weight=label["weight"],size=label["size"])
+                # Resolve exactly the bundled requested family; never silently substitute.
+                path=findfont(font,fallback_to_default=False)
+                require(Path(path).name in ("DejaVuSans.ttf","DejaVuSans-Bold.ttf"),"Unexpected font substitution")
+                artist=ax.text(label["x"],label["y"],label["text"],fontproperties=font,
+                               color=PALETTE[label["color"]],ha=label["align"],va="top",linespacing=1.3)
+                artists.append((label,artist,path))
+            canvas.draw(); renderer=canvas.get_renderer();boxes=[]
+            for label,artist,path in artists:
+                box=artist.get_window_extent(renderer)
+                boxes.append(dict(id=label["id"],text=label["text"],
+                                  bbox=[box.x0,h-box.y1,box.x1,h-box.y0],region=label["region"],
+                                  font=Path(path).name,font_sha256=runner.sha256(Path(path))))
+            buffer=io.BytesIO()
+            canvas.print_png(buffer,metadata=data["rendering"]["png_metadata"])
+            images[name]=buffer.getvalue();geometry[name]=boxes
+            figure.clear()
+    return images,geometry
+
+
+def editorial_readme(data):
+    """Render current README prose while retaining chart JSON's legacy text."""
+    busy, serial = [w["versions"] for w in data["workloads"]]
+    v0, v1, v2 = busy
+    def metric(row, key): return row["metrics"][key]
+    outcome = (f'Under four concurrent requests, v2 reduced median run-level p99 latency from '
+               f'{metric(v0, "p99")["display_number"]} to {metric(v2, "p99")["display_number"]} milliseconds: '
+               f'a {-metric(v2, "p99")["change_percent"]:.0f}% reduction.\n'
+               f'Peak container memory use fell by {-metric(v2, "peak_container_memory")["change_percent"]:.0f}%. '
+               'These results apply to this computer and workload.')
+    columns = ["Version", "Implementation", "p99 latency", "Throughput (requests/s)",
+               "Peak container memory", "Container image size", "Prediction-label agreement", "Decision"]
+    table = ["| " + " | ".join(columns) + " |", "| " + " | ".join(["---"] * len(columns)) + " |"]
+    descriptions = {"v0": "PyTorch / Transformers", "v1": "ONNX Runtime FP32",
+                    "v2": "ONNX Runtime, dynamic INT8"}
+    for row in busy:
+        m = row["metrics"]; v = row["version"]
+        change = m["p99"]["change_percent"]
+        decision = "Baseline" if v == "v0" else (
+            {"KEEP": "Kept", "REJECT": "Rejected", "INCONCLUSIVE": "Inconclusive"}[row["decision"]]
+            + f' — approximately {abs(change):.0f}% ' + ("higher" if change > 0 else "lower") + " p99 latency")
+        agreement = "Original reference" if v == "v0" else f'Yes, all {row["agreement"]["unique_ids"]:,} sentences'
+        table.append("| " + " | ".join([v, descriptions[v], m["p99"]["display"],
+            m["throughput_requests_per_second"]["display_number"], m["peak_container_memory"]["display"],
+            m["docker_image_size_bytes"]["display"], agreement, decision]) + " |")
+    # Preserve the complete exact-numbers table and its methodological notes.
+    exact = data["readme"]["results"].split("<details>", 1)[1].split("</details>", 1)[0]
+    results = (outcome + "\n\n" + "\n".join(table) + "\n\n<details>" + exact + "</details>\n\n"
+        "p99 latency is the response-time threshold within which 99% of measured requests complete. "
+        "Lower values indicate better performance near the slow end of the distribution.\n"
+        "The published p99 is the median of three run-level p99 values, calculated separately using the nearest-rank method; "
+        "requests were not pooled across runs.\n"
+        "Throughput measures completed requests per second. Peak container memory includes startup and warm-ups; "
+        "container image size measures storage, not running memory.\n"
+        f'Both optimized implementations matched baseline prediction labels for all {v2["agreement"]["unique_ids"]:,} '
+        "fixed test sentences across all six runs each. Prediction-label agreement does not measure accuracy against human labels.")
+    s0, s1, _ = serial
+    findings = (f'With individual requests, v1 reduced median run-level p50 latency from '
+        f'{metric(s0, "p50")["display_number"]} to {metric(s1, "p50")["display_number"]} milliseconds.\n'
+        f'Its p99 latency was almost unchanged: {metric(s0, "p99")["display_number"]} versus '
+        f'{metric(s1, "p99")["display_number"]} milliseconds.\n\n'
+        "With four concurrent requests, v1 had higher p50, p95, and p99 latency than v0.\n"
+        "The conversion helped typical single-request latency, but regressed under the primary workload.\n"
+        "I rejected v1 under the predefined acceptance criteria; the single-request improvement did not override the concurrent-workload result.")
+    rejection = (f'I rejected ONNX Runtime FP32 because it increased p99 latency by approximately '
+        f'{metric(v1, "p99")["change_percent"]:.0f}% under the primary concurrent workload.\n'
+        "A smaller container image did not necessarily mean lower inference latency.\n"
+        "The corrected dynamic INT8 implementation met the performance and prediction-label agreement criteria and was selected for this experiment.")
+    return dict(results=results, findings=findings, rejection=rejection)
+
+
+def readme_output(data):
+    text = (ROOT / "README.md").read_text()
+    for key, value in editorial_readme(data).items():
+        opening = "<!-- portfolio:" + key + " -->"
+        closing = "<!-- /portfolio:" + key + " -->"
+        require(text.count(opening) == text.count(closing) == 1,
+                f"Missing README generated block: {key}")
+        before, tail = text.split(opening, 1)
+        _, after = tail.split(closing, 1)
+        text = before + opening + "\n" + value + "\n" + closing + after
+    return text
+
+
+def check_graphics():
+    """Check saved image content hashes via chart JSON, plus PNG type/dimensions."""
+    import struct
+    for name in GRAPHICS:
+        path=ROOT/name
+        require(path.is_file(),f"Missing graphic: {name}; render with pinned development dependencies")
+        raw=path.read_bytes()
+        require(raw[:8]==b"\x89PNG\r\n\x1a\n" and len(raw)>24,f"Invalid PNG: {name}")
+        require(struct.unpack(">II",raw[16:24])==(2200,1120),f"Wrong PNG dimensions: {name}")
+
+
 def outputs(e):
-    return {'docs/benchmark_report.md': markdown(e), 'docs/p99_by_version.svg': svg(e)}
+    data = portfolio_data(e)
+    return {'docs/benchmark_report.md': markdown(e), 'docs/p99_by_version.svg': svg(e),
+            'docs/chart_data.json': json.dumps(data, indent=2, ensure_ascii=False) + '\n',
+            'README.md': readme_output(data)}
 
 
 def main(argv=None):
@@ -370,15 +701,21 @@ def main(argv=None):
     parser.add_argument('--check', action='store_true', help='validate evidence and check output freshness without writing')
     args = parser.parse_args(argv)
     try:
-        rendered = outputs(load_evidence())
+        evidence = load_evidence()
+        if not args.check:
+            images, _ = render_graphics(portfolio_data(evidence))
+            for name, content in images.items():
+                (ROOT / name).write_bytes(content)
+        rendered = outputs(evidence)
         for name, content in rendered.items():
             path = ROOT / name
             if args.check:
                 require(path.is_file() and path.read_bytes() == content.encode('utf-8'), f'Stale or missing output: {name}')
             else:
                 path.write_bytes(content.encode('utf-8'))
+        check_graphics()
         print('PASS: 18 VALID attempts, six consistent summaries, HTTP label agreement, registered decisions; '
-              + ('outputs fresh' if args.check else 'wrote ' + ', '.join(rendered)))
+              + ('outputs fresh' if args.check else 'wrote ' + ', '.join((*GRAPHICS, *rendered))))
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError) as error:
         print(f'Report evidence error: {error}', file=sys.stderr)
         return 1
