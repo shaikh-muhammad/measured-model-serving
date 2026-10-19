@@ -23,6 +23,8 @@ import sys
 spec = importlib.util.spec_from_file_location("report", sys.argv[1])
 report = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(report)
+evidence = report.load_evidence()
+report.outputs(evidence)
 loaded = sorted({"torch", "onnxruntime", "transformers"}.intersection(sys.modules))
 if loaded:
     raise SystemExit("Report import loaded forbidden dependencies: " + ", ".join(loaded))
