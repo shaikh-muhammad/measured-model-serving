@@ -1,0 +1,2828 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "results/v0-baseline/attempt-f78e100ceefc45f8ace980ce57808610.json",
+      "sha256": "6ad855a8dfe86725ebd9f664cac6091d2678cb5dffbdf9b353e226400745abe4",
+      "version": "v0",
+      "concurrency": 4,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v0-baseline/attempt-1040d6c3275b4f74a94278599fd78d24.json",
+      "sha256": "fc5e8f3b63a5601da60bcff5dee58f9e283c1aaf86a25d847b94b9a7e34d5cf6",
+      "version": "v0",
+      "concurrency": 4,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v0-baseline/attempt-d46685a9b179494cb78f02aed2219675.json",
+      "sha256": "d110d66a481e475824859a054ff6d387f111ec7a62ae1bc9a3d915535c9f24c6",
+      "version": "v0",
+      "concurrency": 4,
+      "run_slot": 3
+    },
+    {
+      "path": "results/v1-official/attempt-b02462327cab4e869a10d664fb598177.json",
+      "sha256": "642162a734016979e9c92729cee7e440f3dc17012af4315999d84a2c30cfff94",
+      "version": "v1",
+      "concurrency": 4,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v1-official/attempt-e87b51c5d5304dd0a6cfd12e33f76671.json",
+      "sha256": "b77cd04ee2244cb20a734e9c0907f9ce927817a30f6a7f637603f4679a2b5d97",
+      "version": "v1",
+      "concurrency": 4,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v1-official/attempt-c04413f245f047f5a3a8808ae4abea5f.json",
+      "sha256": "ab01c665f9fbd5f98865d27c07c8c933a950a4ad784e626db3bc0cfba7ca217a",
+      "version": "v1",
+      "concurrency": 4,
+      "run_slot": 3
+    },
+    {
+      "path": "results/v2-official/attempt-a84612ed4fda43c29a4ebde58c2a5551.json",
+      "sha256": "d564d6a32de43e7c869bdb6814747a15983e94ec128f707add513bf2a7879797",
+      "version": "v2",
+      "concurrency": 4,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v2-official/attempt-a76714bbf76f4965aaea9c03241c8737.json",
+      "sha256": "4166838bccfb4f0fdf7242883888a693b09205216ca26285461f8bb8658116d9",
+      "version": "v2",
+      "concurrency": 4,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v2-official/attempt-c05c694963984cd4b0793e16ae84d0e4.json",
+      "sha256": "ead7e0b2b79ad29d1f43746d69c5d1718b0f7178c66dd7cbf669bbdf91c00e23",
+      "version": "v2",
+      "concurrency": 4,
+      "run_slot": 3
+    },
+    {
+      "path": "results/v0-baseline/attempt-cf0ea92acea54b6b99cf1176d3225e6e.json",
+      "sha256": "eac0ec2689e89d2322eb27033c994a152511d36331c520dae4c6beba3a685a21",
+      "version": "v0",
+      "concurrency": 1,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v0-baseline/attempt-f6612b3b9db344ad8dd45222aa69606c.json",
+      "sha256": "7c37184397ed3747135ac1cbde401f3681fe4a0d3a18d1caeae80f9646155fcd",
+      "version": "v0",
+      "concurrency": 1,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v0-baseline/attempt-692ebe3ba524439e9027fddf80d949ff.json",
+      "sha256": "4ecc1c949cf66814b283c666f7c1e262482e937c58aa1e9b9e447d168fa19c0e",
+      "version": "v0",
+      "concurrency": 1,
+      "run_slot": 3
+    },
+    {
+      "path": "results/v1-official/attempt-ec55d0b8a88c4da9b49b779b40bf6da3.json",
+      "sha256": "f8053d7d6b4ba515e5e94ef49f5344ec7e6be5cdc48d2198c1e4ed572b6e2a00",
+      "version": "v1",
+      "concurrency": 1,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v1-official/attempt-5e9e84aaf4664cd581795c09d4731206.json",
+      "sha256": "e3d0e8b739d1c9cea102b277a40ef44bc3e550368d151f42f83d8e4ff49c7f66",
+      "version": "v1",
+      "concurrency": 1,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v1-official/attempt-57f9c386c6724d6fafa7f92dcac29082.json",
+      "sha256": "b07d24a12eb3d97a9dff2d32ac6e344ca79f02c6093157f20a8ffd9383b4cd58",
+      "version": "v1",
+      "concurrency": 1,
+      "run_slot": 3
+    },
+    {
+      "path": "results/v2-official/attempt-ff98a85ca1a941dd822df0e5ef83f1a6.json",
+      "sha256": "1c73197d569af03c8979d32b638eb8c7c9e90cb5c4a0fac5475e6c2d2c7b4d58",
+      "version": "v2",
+      "concurrency": 1,
+      "run_slot": 1
+    },
+    {
+      "path": "results/v2-official/attempt-96b154b38fe1423d9eb2d1c0d76c7bfe.json",
+      "sha256": "9acae347a37b2f0cf262f909e0e83831e19d4db175c5dc6289bba80d6a0d43c9",
+      "version": "v2",
+      "concurrency": 1,
+      "run_slot": 2
+    },
+    {
+      "path": "results/v2-official/attempt-1c27a767a2c94168be97a447e949d3cd.json",
+      "sha256": "a8193282c07c616587b81697a733aa2b53f427a2a73d4234a0bf217d583c52ae",
+      "version": "v2",
+      "concurrency": 1,
+      "run_slot": 3
+    }
+  ],
+  "workloads": [
+    {
+      "concurrency": 4,
+      "label": "Four requests at the same time",
+      "versions": [
+        {
+          "version": "v0",
+          "name": "Original",
+          "description": "The starting model",
+          "category": "STARTING POINT",
+          "badge": "baseline",
+          "decision": "BASELINE",
+          "decision_label": "Starting point",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                363.729137,
+                367.973152,
+                369.10475
+              ],
+              "raw_median": 367.973152,
+              "baseline": 367.973152,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "368",
+              "display": "368 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                859.620583,
+                865.230095,
+                836.103477
+              ],
+              "raw_median": 859.620583,
+              "baseline": 859.620583,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "860",
+              "display": "860 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                987.331188,
+                1028.586478,
+                983.507651
+              ],
+              "raw_median": 987.331188,
+              "baseline": 987.331188,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "987",
+              "display": "987 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                9.566476299472708,
+                9.467402148249223,
+                9.462252001364336
+              ],
+              "raw_median": 9.467402148249223,
+              "baseline": 9.467402148249223,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "9.5",
+              "display": "9.5 requests/s",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                613081088,
+                480747520,
+                527626240
+              ],
+              "raw_median": 527626240,
+              "baseline": 527626240,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "528",
+              "display": "528 MB",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                2106058478,
+                2106058478,
+                2106058478
+              ],
+              "raw_median": 2106058478,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "2.1",
+              "display": "2.1 GB",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                11.309166664,
+                8.624873232,
+                10.981760057
+              ],
+              "raw_median": 10.981760057,
+              "baseline": 10.981760057,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "10.981760057",
+              "display": "10.981760057 s",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 0.8005244236624321
+        },
+        {
+          "version": "v1",
+          "name": "New format",
+          "description": "Converted, not compressed",
+          "category": "TRIED, REJECTED",
+          "badge": "25% slower",
+          "decision": "REJECT",
+          "decision_label": "Rejected: 25% slower",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                416.879244,
+                402.820539,
+                395.367355
+              ],
+              "raw_median": 402.820539,
+              "baseline": 367.973152,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "403",
+              "display": "403 ms",
+              "change_percent": 9.47008954609818,
+              "change_label": "+9% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                985.267498,
+                1000.916849,
+                967.385086
+              ],
+              "raw_median": 985.267498,
+              "baseline": 859.620583,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "985",
+              "display": "985 ms",
+              "change_percent": 14.61655496445925,
+              "change_label": "+15% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                1213.410183,
+                1233.355484,
+                1271.798754
+              ],
+              "raw_median": 1233.355484,
+              "baseline": 987.331188,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "1233",
+              "display": "1233 ms",
+              "change_percent": 24.918112482434815,
+              "change_label": "+25% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                8.396170043804318,
+                8.510557636762677,
+                8.701531968252038
+              ],
+              "raw_median": 8.510557636762677,
+              "baseline": 9.467402148249223,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "8.5",
+              "display": "8.5 requests/s",
+              "change_percent": -10.10672723629356,
+              "change_label": "-10% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                554631168,
+                549056512,
+                548065280
+              ],
+              "raw_median": 549056512,
+              "baseline": 527626240,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "549",
+              "display": "549 MB",
+              "change_percent": 4.061638784303071,
+              "change_label": "+4% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                983250492,
+                983250492,
+                983250492
+              ],
+              "raw_median": 983250492,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "1.0",
+              "display": "1.0 GB",
+              "change_percent": -53.3132388169138,
+              "change_label": "-53% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                3.937453201,
+                4.435775162,
+                3.991549434
+              ],
+              "raw_median": 3.991549434,
+              "baseline": 10.981760057,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "3.991549434",
+              "display": "3.991549434 s",
+              "change_percent": -63.652917079938355,
+              "change_label": "-64% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 1.0
+        },
+        {
+          "version": "v2",
+          "name": "New format + compression",
+          "description": "Converted and compressed",
+          "category": "KEPT",
+          "badge": "37% faster",
+          "decision": "KEEP",
+          "decision_label": "Kept: 37% faster",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                282.404815,
+                278.551001,
+                261.315565
+              ],
+              "raw_median": 278.551001,
+              "baseline": 367.973152,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "279",
+              "display": "279 ms",
+              "change_percent": -24.301270490516664,
+              "change_label": "-24% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                515.48489,
+                546.227027,
+                522.090772
+              ],
+              "raw_median": 522.090772,
+              "baseline": 859.620583,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "522",
+              "display": "522 ms",
+              "change_percent": -39.26497546418104,
+              "change_label": "-39% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                625.35203,
+                668.270409,
+                612.040066
+              ],
+              "raw_median": 625.35203,
+              "baseline": 987.331188,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "625",
+              "display": "625 ms",
+              "change_percent": -36.66238465871292,
+              "change_label": "-37% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                13.519012621450953,
+                13.394471101520162,
+                14.155556234484974
+              ],
+              "raw_median": 13.519012621450953,
+              "baseline": 9.467402148249223,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "13.5",
+              "display": "13.5 requests/s",
+              "change_percent": 42.79537733538638,
+              "change_label": "+43% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                324096000,
+                323043328,
+                321101824
+              ],
+              "raw_median": 323043328,
+              "baseline": 527626240,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "323",
+              "display": "323 MB",
+              "change_percent": -38.77421107790242,
+              "change_label": "-39% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                720020107,
+                720020107,
+                720020107
+              ],
+              "raw_median": 720020107,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "0.7",
+              "display": "0.7 GB",
+              "change_percent": -65.8119603742551,
+              "change_label": "-66% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                3.24632113,
+                3.353619865,
+                2.643636291
+              ],
+              "raw_median": 3.24632113,
+              "baseline": 10.981760057,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "3.246321130",
+              "display": "3.246321130 s",
+              "change_percent": -70.43897232182988,
+              "change_label": "-70% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 0.5070330801723666
+        }
+      ]
+    },
+    {
+      "concurrency": 1,
+      "label": "One request at a time",
+      "versions": [
+        {
+          "version": "v0",
+          "name": "Original",
+          "description": "The starting model",
+          "category": "STARTING POINT",
+          "badge": "baseline",
+          "decision": "BASELINE",
+          "decision_label": "Starting point",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                238.54311,
+                264.980276,
+                263.127529
+              ],
+              "raw_median": 263.127529,
+              "baseline": 263.127529,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "263",
+              "display": "263 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                467.567909,
+                521.658491,
+                501.834485
+              ],
+              "raw_median": 501.834485,
+              "baseline": 501.834485,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "502",
+              "display": "502 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                553.931729,
+                606.837001,
+                568.889771
+              ],
+              "raw_median": 568.889771,
+              "baseline": 568.889771,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "569",
+              "display": "569 ms",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                3.8600354863601707,
+                3.48154752418842,
+                3.568621320195463
+              ],
+              "raw_median": 3.568621320195463,
+              "baseline": 3.568621320195463,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "3.6",
+              "display": "3.6 requests/s",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                412155904,
+                408510464,
+                406372352
+              ],
+              "raw_median": 408510464,
+              "baseline": 408510464,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "409",
+              "display": "409 MB",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                2106058478,
+                2106058478,
+                2106058478
+              ],
+              "raw_median": 2106058478,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "2.1",
+              "display": "2.1 GB",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                8.129933025,
+                7.967704388,
+                8.145302117
+              ],
+              "raw_median": 8.129933025,
+              "baseline": 8.129933025,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "8.129933025",
+              "display": "8.129933025 s",
+              "change_percent": 0.0,
+              "change_label": "original",
+              "change_color": "grey",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 0.998185928949329
+        },
+        {
+          "version": "v1",
+          "name": "New format",
+          "description": "Converted, not compressed",
+          "category": "TRIED, REJECTED",
+          "badge": "0% slower",
+          "decision": "REJECT",
+          "decision_label": "Rejected: 0% slower",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                166.256699,
+                161.981393,
+                152.645517
+              ],
+              "raw_median": 161.981393,
+              "baseline": 263.127529,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "162",
+              "display": "162 ms",
+              "change_percent": -38.43996726013415,
+              "change_label": "-38% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                478.532524,
+                449.277257,
+                440.213071
+              ],
+              "raw_median": 449.277257,
+              "baseline": 501.834485,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "449",
+              "display": "449 ms",
+              "change_percent": -10.473020402334438,
+              "change_label": "-10% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                613.368213,
+                569.923653,
+                556.269799
+              ],
+              "raw_median": 569.923653,
+              "baseline": 568.889771,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "570",
+              "display": "570 ms",
+              "change_percent": 0.1817367885139824,
+              "change_label": "+0% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                4.780365971796511,
+                5.022234807576585,
+                5.255712973250262
+              ],
+              "raw_median": 5.022234807576585,
+              "baseline": 3.568621320195463,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "5.0",
+              "display": "5.0 requests/s",
+              "change_percent": 40.73319517413812,
+              "change_label": "+41% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                835268608,
+                494280704,
+                494940160
+              ],
+              "raw_median": 494940160,
+              "baseline": 408510464,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "495",
+              "display": "495 MB",
+              "change_percent": 21.157278360438767,
+              "change_label": "+21% vs original",
+              "change_color": "orange",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                983250492,
+                983250492,
+                983250492
+              ],
+              "raw_median": 983250492,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "1.0",
+              "display": "1.0 GB",
+              "change_percent": -53.3132388169138,
+              "change_label": "-53% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                5.38572745,
+                3.858928727,
+                3.679682374
+              ],
+              "raw_median": 3.858928727,
+              "baseline": 8.129933025,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "3.858928727",
+              "display": "3.858928727 s",
+              "change_percent": -52.53431098222362,
+              "change_label": "-53% vs original",
+              "change_color": "teal",
+              "best": false,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 1.0
+        },
+        {
+          "version": "v2",
+          "name": "New format + compression",
+          "description": "Converted and compressed",
+          "category": "KEPT",
+          "badge": "45% faster",
+          "decision": "KEEP",
+          "decision_label": "Kept: 45% faster",
+          "metrics": {
+            "p50": {
+              "run_values": [
+                89.032169,
+                97.797401,
+                93.116056
+              ],
+              "raw_median": 93.116056,
+              "baseline": 263.127529,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "93",
+              "display": "93 ms",
+              "change_percent": -64.6118152844433,
+              "change_label": "-65% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p95": {
+              "run_values": [
+                227.630708,
+                233.837834,
+                240.739466
+              ],
+              "raw_median": 233.837834,
+              "baseline": 501.834485,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "234",
+              "display": "234 ms",
+              "change_percent": -53.40339474677592,
+              "change_label": "-53% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "p99": {
+              "run_values": [
+                310.740351,
+                301.079745,
+                316.840813
+              ],
+              "raw_median": 310.740351,
+              "baseline": 568.889771,
+              "divisor": 1,
+              "digits": 0,
+              "unit": "ms",
+              "display_number": "311",
+              "display": "311 ms",
+              "change_percent": -45.37775737226254,
+              "change_label": "-45% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "throughput_requests_per_second": {
+              "run_values": [
+                9.428665723011349,
+                8.841493593215274,
+                9.01143961923557
+              ],
+              "raw_median": 9.01143961923557,
+              "baseline": 3.568621320195463,
+              "divisor": 1,
+              "digits": 1,
+              "unit": "requests/s",
+              "display_number": "9.0",
+              "display": "9.0 requests/s",
+              "change_percent": 152.51879677561277,
+              "change_label": "+153% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "peak_container_memory": {
+              "run_values": [
+                300486656,
+                302333952,
+                292913152
+              ],
+              "raw_median": 300486656,
+              "baseline": 408510464,
+              "divisor": 1000000,
+              "digits": 0,
+              "unit": "MB",
+              "display_number": "300",
+              "display": "300 MB",
+              "change_percent": -26.44333928249143,
+              "change_label": "-26% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "docker_image_size_bytes": {
+              "run_values": [
+                720020107,
+                720020107,
+                720020107
+              ],
+              "raw_median": 720020107,
+              "baseline": 2106058478,
+              "divisor": 1000000000,
+              "digits": 1,
+              "unit": "GB",
+              "display_number": "0.7",
+              "display": "0.7 GB",
+              "change_percent": -65.8119603742551,
+              "change_label": "-66% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            },
+            "startup_time_seconds": {
+              "run_values": [
+                2.686598337,
+                2.490054628,
+                2.748774862
+              ],
+              "raw_median": 2.686598337,
+              "baseline": 8.129933025,
+              "divisor": 1,
+              "digits": 9,
+              "unit": "s",
+              "display_number": "2.686598337",
+              "display": "2.686598337 s",
+              "change_percent": -66.95423776876687,
+              "change_label": "-67% vs original",
+              "change_color": "teal",
+              "best": true,
+              "formula": "median of three VALID run-level statistics; no pooling",
+              "rounding": "format fixed point, round half to even; convert units after median"
+            }
+          },
+          "agreement": {
+            "unique_ids": 1000,
+            "matching": 6000,
+            "total": 6000,
+            "fraction": 1.0,
+            "mismatching_ids": [],
+            "mismatch_counts": {
+              "long": 0,
+              "medium": 0,
+              "short": 0
+            }
+          },
+          "progress_fraction": 0.5452315399866375
+        }
+      ]
+    }
+  ],
+  "palette": {
+    "background": "#f6f5f2",
+    "dark": "#14151a",
+    "secondary": "#5b5d66",
+    "teal": "#0b8f80",
+    "teal_tint": "#e6f5f2",
+    "orange": "#c96a0a",
+    "orange_tint": "#fdf0e2",
+    "grey": "#6b6e7a",
+    "grey_tint": "#eeeef1"
+  },
+  "rendering": {
+    "font": "DejaVu Sans",
+    "font_source": "Matplotlib bundled regular and bold fonts",
+    "matplotlib": "3.11.2",
+    "dpi": 100,
+    "png_metadata": {
+      "Software": "Measured Model Serving"
+    },
+    "dimensions": {
+      "docs/result-cards.png": [
+        2200,
+        1120
+      ],
+      "docs/typical-vs-slowest.png": [
+        2200,
+        1120
+      ]
+    },
+    "units": {
+      "MB": 1000000,
+      "GB": 1000000000,
+      "MiB": 1048576
+    },
+    "progress_formula": "version median p99 / largest version median p99 at four requests"
+  },
+  "readme": {
+    "results": "I reduced the delay reached by 99 in 100 requests from about 987 to 625 milliseconds: a 37% reduction.\nIts measured memory use fell by 39%. These results apply to this computer and workload.\n\n| Version | What it is | Slowest 1% of requests | Requests per second | Memory | Size on disk | Same answers as original | Decision |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| v0 | The starting model | 987 ms | 9.5 | 528 MB | 2.1 GB | Original reference | Starting point |\n| v1 | Converted, not compressed | 1233 ms | 8.5 | 549 MB | 1.0 GB | Yes, all 1,000 sentences | Rejected: 25% slower |\n| v2 | Converted and compressed | 625 ms | 13.5 | 323 MB | 0.7 GB | Yes, all 1,000 sentences | Kept: 37% faster |\n\n<details>\n<summary>Exact numbers and units</summary>\n\n| Version | p50 ms | p95 ms | p99 ms | Requests/s | Peak memory bytes | Peak memory MiB | Image bytes | Startup seconds | Matching HTTP labels | Decision |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| v0 | 367.973152 | 859.620583 | 987.331188 | 9.467402148249223 | 527626240 | 503.18359375 | 2106058478 | 10.981760057 | 6000/6000 | BASELINE |\n| v1 | 402.820539 | 985.267498 | 1233.355484 | 8.510557636762677 | 549056512 | 523.62109375 | 983250492 | 3.991549434 | 6000/6000 | REJECT |\n| v2 | 278.551001 | 522.090772 | 625.352030 | 13.519012621450953 | 323043328 | 308.078125 | 720020107 | 3.246321130 | 6000/6000 | KEEP |\n\nEach value is the median of three valid run-level values at four simultaneous requests. Memory includes startup and warm-ups. MiB means bytes / 1,048,576. Size is Docker's built-image size. The full report retains all ranges and timing definitions.\n\n</details>\n\nThe slowest-1% column is the 99-in-100 timing threshold. Percent faster means a reduction in that delay.\nBoth other versions matched the original answers for all 1,000 fixed test sentences across all six runs each. Matching answers does not measure accuracy against human labels.",
+    "findings": "With one request at a time, v1 improved the typical wait from 263 to 162 milliseconds.\nIts slowest-1% time was almost unchanged: 569 versus 570 milliseconds.\n\nWith four requests at the same time, v1 was slower at every reported delay point.\nThe format change helped when requests came one by one, but not when several arrived together.\nI decided in advance that the busy case decides, so I rejected the format-only version.",
+    "rejection": "Converting the model to another format made the slowest requests about 25% slower in the busy test, so I rejected that version.\nCompressing the converted model produced the observed improvement.\nA smaller download did not guarantee a shorter wait."
+  },
+  "graphics": {
+    "docs/result-cards.png": {
+      "size": [
+        2200,
+        1120
+      ],
+      "texts": [
+        {
+          "id": "title",
+          "text": "Same AI model, three ways to run it",
+          "x": 60,
+          "y": 45,
+          "size": 34,
+          "region": [
+            50,
+            20,
+            2150,
+            195
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "subtitle",
+          "text": "Four requests at the same time · Middle result of three runs on one computer",
+          "x": 60,
+          "y": 125,
+          "size": 22,
+          "region": [
+            50,
+            20,
+            2150,
+            195
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-category",
+          "text": "STARTING POINT",
+          "x": 88,
+          "y": 265,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-badge",
+          "text": "baseline",
+          "x": 686,
+          "y": 265,
+          "size": 14,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "0-name",
+          "text": "v0 · Original",
+          "x": 88,
+          "y": 335,
+          "size": 24,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-description",
+          "text": "The starting model",
+          "x": 88,
+          "y": 397,
+          "size": 18,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-p99",
+          "text": "987 ms",
+          "x": 88,
+          "y": 475,
+          "size": 52,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-caption",
+          "text": "slowest 1% of requests",
+          "x": 88,
+          "y": 575,
+          "size": 18,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-throughput_requests_per_second-label",
+          "text": "Requests per second",
+          "x": 88,
+          "y": 710,
+          "size": 16,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-throughput_requests_per_second-value",
+          "text": "9.5",
+          "x": 686,
+          "y": 706,
+          "size": 23,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "0-throughput_requests_per_second-delta",
+          "text": "original",
+          "x": 686,
+          "y": 753,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "0-peak_container_memory-label",
+          "text": "Memory",
+          "x": 88,
+          "y": 788,
+          "size": 16,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-peak_container_memory-value",
+          "text": "528 MB",
+          "x": 686,
+          "y": 784,
+          "size": 23,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "0-peak_container_memory-delta",
+          "text": "original",
+          "x": 686,
+          "y": 831,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "0-docker_image_size_bytes-label",
+          "text": "Size on disk",
+          "x": 88,
+          "y": 866,
+          "size": 16,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-docker_image_size_bytes-value",
+          "text": "2.1 GB",
+          "x": 686,
+          "y": 862,
+          "size": 23,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "0-docker_image_size_bytes-delta",
+          "text": "original",
+          "x": 686,
+          "y": 909,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            708,
+            952
+          ],
+          "color": "grey",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "1-category",
+          "text": "TRIED, REJECTED",
+          "x": 793,
+          "y": 265,
+          "size": 13,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "orange",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-badge",
+          "text": "25% slower",
+          "x": 1391,
+          "y": 265,
+          "size": 14,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "orange",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "1-name",
+          "text": "v1 · New format",
+          "x": 793,
+          "y": 335,
+          "size": 24,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-description",
+          "text": "Converted, not compressed",
+          "x": 793,
+          "y": 397,
+          "size": 18,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-p99",
+          "text": "1233 ms",
+          "x": 793,
+          "y": 475,
+          "size": 52,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "orange",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-caption",
+          "text": "slowest 1% of requests",
+          "x": 793,
+          "y": 575,
+          "size": 18,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-throughput_requests_per_second-label",
+          "text": "Requests per second",
+          "x": 793,
+          "y": 710,
+          "size": 16,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-throughput_requests_per_second-value",
+          "text": "8.5",
+          "x": 1391,
+          "y": 706,
+          "size": 23,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "1-throughput_requests_per_second-delta",
+          "text": "-10% vs original",
+          "x": 1391,
+          "y": 753,
+          "size": 13,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "orange",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "1-peak_container_memory-label",
+          "text": "Memory",
+          "x": 793,
+          "y": 788,
+          "size": 16,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-peak_container_memory-value",
+          "text": "549 MB",
+          "x": 1391,
+          "y": 784,
+          "size": 23,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "1-peak_container_memory-delta",
+          "text": "+4% vs original",
+          "x": 1391,
+          "y": 831,
+          "size": 13,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "orange",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "1-docker_image_size_bytes-label",
+          "text": "Size on disk",
+          "x": 793,
+          "y": 866,
+          "size": 16,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-docker_image_size_bytes-value",
+          "text": "1.0 GB",
+          "x": 1391,
+          "y": 862,
+          "size": 23,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "1-docker_image_size_bytes-delta",
+          "text": "-53% vs original",
+          "x": 1391,
+          "y": 909,
+          "size": 13,
+          "region": [
+            787,
+            250,
+            1413,
+            952
+          ],
+          "color": "teal",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "2-category",
+          "text": "KEPT",
+          "x": 1498,
+          "y": 265,
+          "size": 13,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "2-badge",
+          "text": "37% faster",
+          "x": 2096,
+          "y": 265,
+          "size": 14,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "2-name",
+          "text": "v2 · New format + compression",
+          "x": 1498,
+          "y": 335,
+          "size": 24,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "2-description",
+          "text": "Converted and compressed",
+          "x": 1498,
+          "y": 397,
+          "size": 18,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "2-p99",
+          "text": "625 ms",
+          "x": 1498,
+          "y": 475,
+          "size": 52,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "2-caption",
+          "text": "slowest 1% of requests",
+          "x": 1498,
+          "y": 575,
+          "size": 18,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "2-throughput_requests_per_second-label",
+          "text": "Requests per second",
+          "x": 1498,
+          "y": 710,
+          "size": 16,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "2-throughput_requests_per_second-value",
+          "text": "13.5",
+          "x": 2096,
+          "y": 706,
+          "size": 23,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "2-throughput_requests_per_second-delta",
+          "text": "+43% vs original",
+          "x": 2096,
+          "y": 753,
+          "size": 13,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "2-peak_container_memory-label",
+          "text": "Memory",
+          "x": 1498,
+          "y": 788,
+          "size": 16,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "2-peak_container_memory-value",
+          "text": "323 MB",
+          "x": 2096,
+          "y": 784,
+          "size": 23,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "2-peak_container_memory-delta",
+          "text": "-39% vs original",
+          "x": 2096,
+          "y": 831,
+          "size": 13,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "2-docker_image_size_bytes-label",
+          "text": "Size on disk",
+          "x": 1498,
+          "y": 866,
+          "size": 16,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "2-docker_image_size_bytes-value",
+          "text": "0.7 GB",
+          "x": 2096,
+          "y": 862,
+          "size": 23,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "right"
+        },
+        {
+          "id": "2-docker_image_size_bytes-delta",
+          "text": "-66% vs original",
+          "x": 2096,
+          "y": 909,
+          "size": 13,
+          "region": [
+            1492,
+            250,
+            2118,
+            952
+          ],
+          "color": "teal",
+          "weight": "normal",
+          "align": "right"
+        },
+        {
+          "id": "agreement",
+          "text": "Both other versions gave the same answers as the original on all 1,000 test sentences.",
+          "x": 60,
+          "y": 1035,
+          "size": 19,
+          "region": [
+            50,
+            1010,
+            2150,
+            1100
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        }
+      ],
+      "cards": [
+        {
+          "rect": [
+            60,
+            230,
+            670,
+            750
+          ],
+          "accent": "grey",
+          "border": 1
+        },
+        {
+          "rect": [
+            765,
+            230,
+            670,
+            750
+          ],
+          "accent": "orange",
+          "border": 1
+        },
+        {
+          "rect": [
+            1470,
+            230,
+            670,
+            750
+          ],
+          "accent": "teal",
+          "border": 3
+        }
+      ],
+      "tracks": [
+        {
+          "rect": [
+            88,
+            625,
+            614,
+            8
+          ],
+          "fraction": 0.8005244236624321,
+          "color": "grey"
+        },
+        {
+          "rect": [
+            793,
+            625,
+            614,
+            8
+          ],
+          "fraction": 1.0,
+          "color": "orange"
+        },
+        {
+          "rect": [
+            1498,
+            625,
+            614,
+            8
+          ],
+          "fraction": 0.5070330801723666,
+          "color": "teal"
+        }
+      ]
+    },
+    "docs/typical-vs-slowest.png": {
+      "size": [
+        2200,
+        1120
+      ],
+      "texts": [
+        {
+          "id": "title",
+          "text": "Typical, slow and slowest",
+          "x": 60,
+          "y": 45,
+          "size": 34,
+          "region": [
+            50,
+            20,
+            2150,
+            195
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "subtitle",
+          "text": "Typical = middle request · Slow = 95 in 100 · Slowest = 99 in 100",
+          "x": 60,
+          "y": 125,
+          "size": 22,
+          "region": [
+            50,
+            20,
+            2150,
+            195
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-workload",
+          "text": "Four requests at the same time",
+          "x": 90,
+          "y": 270,
+          "size": 24,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-qualifier",
+          "text": "the main test",
+          "x": 90,
+          "y": 322,
+          "size": 17,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "0-p50-heading",
+          "text": "Typical\nrequest",
+          "x": 315,
+          "y": 405,
+          "size": 18,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-0-version",
+          "text": "v0",
+          "x": 92,
+          "y": 541,
+          "size": 22,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-0-p50-value",
+          "text": "368 ms",
+          "x": 315,
+          "y": 535,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-1-version",
+          "text": "v1",
+          "x": 92,
+          "y": 681,
+          "size": 22,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-1-p50-value",
+          "text": "403 ms",
+          "x": 315,
+          "y": 675,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-2-version",
+          "text": "v2",
+          "x": 92,
+          "y": 821,
+          "size": 22,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "0-2-p50-value",
+          "text": "279 ms",
+          "x": 315,
+          "y": 815,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "0-2-p50-best",
+          "text": "best",
+          "x": 315,
+          "y": 883,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "0-p95-heading",
+          "text": "Slow\nrequest",
+          "x": 605,
+          "y": 405,
+          "size": 18,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-0-p95-value",
+          "text": "860 ms",
+          "x": 605,
+          "y": 535,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-1-p95-value",
+          "text": "985 ms",
+          "x": 605,
+          "y": 675,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-2-p95-value",
+          "text": "522 ms",
+          "x": 605,
+          "y": 815,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "0-2-p95-best",
+          "text": "best",
+          "x": 605,
+          "y": 883,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "0-p99-heading",
+          "text": "Slowest 1%\nof requests",
+          "x": 895,
+          "y": 405,
+          "size": 18,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-0-p99-value",
+          "text": "987 ms",
+          "x": 895,
+          "y": 535,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-1-p99-value",
+          "text": "1233 ms",
+          "x": 895,
+          "y": 675,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "0-2-p99-value",
+          "text": "625 ms",
+          "x": 895,
+          "y": 815,
+          "size": 32,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "0-2-p99-best",
+          "text": "best",
+          "x": 895,
+          "y": 883,
+          "size": 13,
+          "region": [
+            82,
+            250,
+            1058,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-workload",
+          "text": "One request at a time",
+          "x": 1170,
+          "y": 270,
+          "size": 24,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-qualifier",
+          "text": "the quieter test",
+          "x": 1170,
+          "y": 322,
+          "size": 17,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        },
+        {
+          "id": "1-p50-heading",
+          "text": "Typical\nrequest",
+          "x": 1395,
+          "y": 405,
+          "size": 18,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-0-version",
+          "text": "v0",
+          "x": 1172,
+          "y": 541,
+          "size": 22,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-0-p50-value",
+          "text": "263 ms",
+          "x": 1395,
+          "y": 535,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-1-version",
+          "text": "v1",
+          "x": 1172,
+          "y": 681,
+          "size": 22,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-1-p50-value",
+          "text": "162 ms",
+          "x": 1395,
+          "y": 675,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-2-version",
+          "text": "v2",
+          "x": 1172,
+          "y": 821,
+          "size": 22,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "bold",
+          "align": "left"
+        },
+        {
+          "id": "1-2-p50-value",
+          "text": "93 ms",
+          "x": 1395,
+          "y": 815,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-2-p50-best",
+          "text": "best",
+          "x": 1395,
+          "y": 883,
+          "size": 13,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-p95-heading",
+          "text": "Slow\nrequest",
+          "x": 1685,
+          "y": 405,
+          "size": 18,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-0-p95-value",
+          "text": "502 ms",
+          "x": 1685,
+          "y": 535,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-1-p95-value",
+          "text": "449 ms",
+          "x": 1685,
+          "y": 675,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-2-p95-value",
+          "text": "234 ms",
+          "x": 1685,
+          "y": 815,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-2-p95-best",
+          "text": "best",
+          "x": 1685,
+          "y": 883,
+          "size": 13,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-p99-heading",
+          "text": "Slowest 1%\nof requests",
+          "x": 1975,
+          "y": 405,
+          "size": 18,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-0-p99-value",
+          "text": "569 ms",
+          "x": 1975,
+          "y": 535,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-1-p99-value",
+          "text": "570 ms",
+          "x": 1975,
+          "y": 675,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "dark",
+          "weight": "normal",
+          "align": "center"
+        },
+        {
+          "id": "1-2-p99-value",
+          "text": "311 ms",
+          "x": 1975,
+          "y": 815,
+          "size": 32,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "1-2-p99-best",
+          "text": "best",
+          "x": 1975,
+          "y": 883,
+          "size": 13,
+          "region": [
+            1162,
+            250,
+            2138,
+            960
+          ],
+          "color": "teal",
+          "weight": "bold",
+          "align": "center"
+        },
+        {
+          "id": "method",
+          "text": "Each cell is the middle of three run-level measurements · Lower times are better",
+          "x": 60,
+          "y": 1035,
+          "size": 19,
+          "region": [
+            50,
+            1010,
+            2150,
+            1100
+          ],
+          "color": "secondary",
+          "weight": "normal",
+          "align": "left"
+        }
+      ],
+      "cards": [
+        {
+          "rect": [
+            60,
+            230,
+            1020,
+            750
+          ],
+          "accent": "grey",
+          "border": 1
+        },
+        {
+          "rect": [
+            1140,
+            230,
+            1020,
+            750
+          ],
+          "accent": "grey",
+          "border": 1
+        }
+      ],
+      "tracks": []
+    }
+  },
+  "labels": [
+    "Same AI model, three ways to run it",
+    "Four requests at the same time · Middle result of three runs on one computer",
+    "STARTING POINT",
+    "baseline",
+    "v0 · Original",
+    "The starting model",
+    "987 ms",
+    "slowest 1% of requests",
+    "Requests per second",
+    "9.5",
+    "original",
+    "Memory",
+    "528 MB",
+    "original",
+    "Size on disk",
+    "2.1 GB",
+    "original",
+    "TRIED, REJECTED",
+    "25% slower",
+    "v1 · New format",
+    "Converted, not compressed",
+    "1233 ms",
+    "slowest 1% of requests",
+    "Requests per second",
+    "8.5",
+    "-10% vs original",
+    "Memory",
+    "549 MB",
+    "+4% vs original",
+    "Size on disk",
+    "1.0 GB",
+    "-53% vs original",
+    "KEPT",
+    "37% faster",
+    "v2 · New format + compression",
+    "Converted and compressed",
+    "625 ms",
+    "slowest 1% of requests",
+    "Requests per second",
+    "13.5",
+    "+43% vs original",
+    "Memory",
+    "323 MB",
+    "-39% vs original",
+    "Size on disk",
+    "0.7 GB",
+    "-66% vs original",
+    "Both other versions gave the same answers as the original on all 1,000 test sentences.",
+    "Typical, slow and slowest",
+    "Typical = middle request · Slow = 95 in 100 · Slowest = 99 in 100",
+    "Four requests at the same time",
+    "the main test",
+    "Typical\nrequest",
+    "v0",
+    "368 ms",
+    "v1",
+    "403 ms",
+    "v2",
+    "279 ms",
+    "best",
+    "Slow\nrequest",
+    "860 ms",
+    "985 ms",
+    "522 ms",
+    "best",
+    "Slowest 1%\nof requests",
+    "987 ms",
+    "1233 ms",
+    "625 ms",
+    "best",
+    "One request at a time",
+    "the quieter test",
+    "Typical\nrequest",
+    "v0",
+    "263 ms",
+    "v1",
+    "162 ms",
+    "v2",
+    "93 ms",
+    "best",
+    "Slow\nrequest",
+    "502 ms",
+    "449 ms",
+    "234 ms",
+    "best",
+    "Slowest 1%\nof requests",
+    "569 ms",
+    "570 ms",
+    "311 ms",
+    "best",
+    "Each cell is the middle of three run-level measurements · Lower times are better"
+  ],
+  "image_sha256": {
+    "docs/result-cards.png": "84afb63d4b0239b7146c627a2c36523c89c23309f6aab227ff3c8765945d2026",
+    "docs/typical-vs-slowest.png": "53023300f6f58891712ea46030ba977c9513711202aea9141685beed506bb692"
+  }
+}
