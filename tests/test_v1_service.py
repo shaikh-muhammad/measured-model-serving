@@ -156,7 +156,7 @@ def test_missing_local_files_and_wrong_threads_stop(tmp_path):
     with patch.dict(os.environ, MODEL_DIR=str(tmp_path), MODEL_THREADS='4'):
         with pytest.raises(RuntimeError, match='Missing regular local artifact'):
             OnnxBackend.from_environment()
-    with patch.dict(os.environ, MODEL_THREADS='2'):
+    with patch.dict(os.environ, MODEL_DIR=str(tmp_path), MODEL_THREADS='2'):
         with pytest.raises(RuntimeError, match='Frozen MODEL_THREADS=4'):
             OnnxBackend.from_environment()
 

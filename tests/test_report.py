@@ -15,6 +15,22 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("report", ROOT / "bench/report.py")
 report = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(report)
+REPORT_IMPORT_CHECK = [
+    sys.executable, "-I", "-B", "-c",
+    """import importlib.util
+import sys
+
+spec = importlib.util.spec_from_file_location("report", sys.argv[1])
+report = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(report)
+evidence = report.load_evidence()
+report.outputs(evidence)
+loaded = sorted({"torch", "onnxruntime", "transformers"}.intersection(sys.modules))
+if loaded:
+    raise SystemExit("Report import loaded forbidden dependencies: " + ", ".join(loaded))
+""",
+    str(ROOT / "bench/report.py"),
+]
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +38,9 @@ def offline(monkeypatch):
     original = subprocess.Popen
 
     def guarded(argv, *args, **kwargs):
-        assert argv[0] == "git" and argv[1] in ("show", "ls-tree"), argv
+        assert argv == REPORT_IMPORT_CHECK or (
+            argv[0] == "git" and argv[1] in ("show", "ls-tree")
+        ), argv
         return original(argv, *args, **kwargs)
 
     def forbidden(*args, **kwargs):
@@ -163,7 +181,11 @@ def test_outputs_values_units_xml_and_determinism(evidence):
             assert report.interval(s["peak_container_memory"], 1024**2) in md
             assert report.interval(s["docker_image_size_bytes"], digits=0) in md
     assert all(p.read_bytes() == data for p, data in before.items())
-    assert not {"torch", "onnxruntime", "transformers"}.intersection(sys.modules)
+    result = subprocess.run(REPORT_IMPORT_CHECK, capture_output=True, text=True)
+    assert result.returncode == 0, (
+        f"Isolated report import failed ({result.returncode})\n"
+        f"stdout: {result.stdout}\nstderr: {result.stderr}"
+    )
 
 
 def test_integrity_rejects_changed_input(monkeypatch):
