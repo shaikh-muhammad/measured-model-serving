@@ -1,19 +1,25 @@
 # Measured Model Serving
 
-I made a sentence-reading model respond faster on an ordinary computer chip without a graphics card, then measured each change—including one that made it worse.
+**An evidence-driven evaluation of CPU inference performance using PyTorch, ONNX Runtime, and dynamic quantization.**
+
+I evaluated three implementations of a sentiment-classification service under controlled CPU and memory limits, with no GPU inference.
+I measured inference latency, throughput, memory consumption, and container image size.
+
+Under the primary workload, the optimized implementation achieved 37% lower p99 latency and 39% lower measured peak container memory than the baseline.
+A format-only conversion increased p99 latency and was rejected.
 
 ![Evaluating CPU Inference Optimizations](docs/result-cards.png)
 
 ```mermaid
 flowchart TD
-    input["Someone sends a sentence"] --> check["Check the input"]
-    check --> pieces["Cut it into word pieces"]
-    pieces --> model["Model runs it"]
-    model --> answer["Positive or negative answer,<br/>plus confidence"]
+    input["Client Request"] --> check["Input Validation"]
+    check --> pieces["Tokenization"]
+    pieces --> model["CPU Inference"]
+    model --> answer["Sentiment Prediction<br/>label and confidence"]
     subgraph choice["Choose one version when building the container"]
-        v0["v0 Original"]
-        v1["v1 New format"]
-        v2["v2 New format plus compression"]
+        v0["v0 — PyTorch Baseline"]
+        v1["v1 — ONNX Runtime FP32"]
+        v2["v2 — Quantized ONNX Runtime INT8"]
     end
     v0 -.-> model
     v1 -.-> model
@@ -30,30 +36,35 @@ flowchart TD
 
 ## What I measured and why
 
-The service reads an English sentence and predicts whether its tone is positive or negative.
-I compared three ways of running the same model, including a smaller representation of its numbers.
+The service performs sentiment classification: it predicts a positive or negative label for English text.
+I compared three implementations of the same model:
 
-I measured response time, requests handled per second, memory use, and size on disk.
-The main test sent four requests at the same time, with fixed processor and memory limits.
-I also measured requests arriving one by one.
+- **v0 — PyTorch / Transformers:** the baseline implementation.
+- **v1 — ONNX Runtime FP32:** a converted model using ONNX Runtime, an execution engine for models in the ONNX format, with 32-bit floating-point weights.
+- **v2 — ONNX Runtime with signed INT8 dynamic quantization:** selected matrix weights use signed 8-bit integers; activation quantization parameters are calculated during inference. The embedding tables remain in their original floating-point format.
 
-Each setting used three valid runs of the same 1,000 made-up sentences.
-Separate warm-up requests were excluded.
-I kept the rules and original records so another person can check the decisions.
+Quantization reduces numerical precision and can reduce memory consumption or inference latency, but may also change predictions.
 
-I use decimal units here: 1 MB = 1,000,000 bytes and 1 GB = 1,000,000,000 bytes.
+I used a fixed set of 1,000 synthetic sentences, four CPU cores, a 2 GiB container memory limit, and three valid runs per workload setting.
+The sentences were not human-labelled accuracy data.
+Performance was evaluated with individual requests and four concurrent requests.
+The concurrent workload determined the optimization decision under the predefined acceptance criteria.
+Each run included 100 separate warm-up requests, excluded from reported request timings, throughput, and label comparison.
+
+The [engineering log](docs/engineering-log.md#registered-experiment-design) preserves the exact metric definitions, acceptance criteria, and validity checks.
+I use decimal units for the rounded results: 1 MB = 1,000,000 bytes and 1 GB = 1,000,000,000 bytes.
 
 ## Results
 
 <!-- portfolio:results -->
-I reduced the delay reached by 99 in 100 requests from about 987 to 625 milliseconds: a 37% reduction.
-Its measured memory use fell by 39%. These results apply to this computer and workload.
+Under four concurrent requests, v2 reduced median run-level p99 latency from 987 to 625 milliseconds: a 37% reduction.
+Peak container memory use fell by 39%. These results apply to this computer and workload.
 
-| Version | What it is | Slowest 1% of requests | Requests per second | Memory | Size on disk | Same answers as original | Decision |
+| Version | Implementation | p99 latency | Throughput (requests/s) | Peak container memory | Container image size | Prediction-label agreement | Decision |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| v0 | The starting model | 987 ms | 9.5 | 528 MB | 2.1 GB | Original reference | Starting point |
-| v1 | Converted, not compressed | 1233 ms | 8.5 | 549 MB | 1.0 GB | Yes, all 1,000 sentences | Rejected: 25% slower |
-| v2 | Converted and compressed | 625 ms | 13.5 | 323 MB | 0.7 GB | Yes, all 1,000 sentences | Kept: 37% faster |
+| v0 | PyTorch / Transformers | 987 ms | 9.5 | 528 MB | 2.1 GB | Original reference | Baseline |
+| v1 | ONNX Runtime FP32 | 1233 ms | 8.5 | 549 MB | 1.0 GB | Yes, all 1,000 sentences | Rejected — approximately 25% higher p99 latency |
+| v2 | ONNX Runtime, dynamic INT8 | 625 ms | 13.5 | 323 MB | 0.7 GB | Yes, all 1,000 sentences | Kept — approximately 37% lower p99 latency |
 
 <details>
 <summary>Exact numbers and units</summary>
@@ -68,19 +79,21 @@ Each value is the median of three valid run-level values at four simultaneous re
 
 </details>
 
-The slowest-1% column is the 99-in-100 timing threshold. Percent faster means a reduction in that delay.
-Both other versions matched the original answers for all 1,000 fixed test sentences across all six runs each. Matching answers does not measure accuracy against human labels.
+p99 latency is the response-time threshold within which 99% of measured requests complete. Lower values indicate better performance near the slow end of the distribution.
+The published p99 is the median of three run-level p99 values, calculated separately using the nearest-rank method; requests were not pooled across runs.
+Throughput measures completed requests per second. Peak container memory includes startup and warm-ups; container image size measures storage, not running memory.
+Both optimized implementations matched baseline prediction labels for all 1,000 fixed test sentences across all six runs each. Prediction-label agreement does not measure accuracy against human labels.
 <!-- /portfolio:results -->
 
 ![Typical, slow and slowest request times for both workloads](docs/typical-vs-slowest.png)
 
 <!-- portfolio:findings -->
-With one request at a time, v1 improved the typical wait from 263 to 162 milliseconds.
-Its slowest-1% time was almost unchanged: 569 versus 570 milliseconds.
+With individual requests, v1 reduced median run-level p50 latency from 263 to 162 milliseconds.
+Its p99 latency was almost unchanged: 569 versus 570 milliseconds.
 
-With four requests at the same time, v1 was slower at every reported delay point.
-The format change helped when requests came one by one, but not when several arrived together.
-I decided in advance that the busy case decides, so I rejected the format-only version.
+With four concurrent requests, v1 had higher p50, p95, and p99 latency than v0.
+The conversion helped typical single-request latency, but regressed under the primary workload.
+I rejected v1 under the predefined acceptance criteria; the single-request improvement did not override the concurrent-workload result.
 <!-- /portfolio:findings -->
 
 The [full benchmark report](docs/benchmark_report.md) includes every range, variation warning, and original result file.
@@ -89,37 +102,40 @@ The [generated chart data](docs/chart_data.json) records each displayed value, i
 ## What did not help
 
 <!-- portfolio:rejection -->
-Converting the model to another format made the slowest requests about 25% slower in the busy test, so I rejected that version.
-Compressing the converted model produced the observed improvement.
-A smaller download did not guarantee a shorter wait.
+I rejected ONNX Runtime FP32 because it increased p99 latency by approximately 25% under the primary concurrent workload.
+A smaller container image did not necessarily mean lower inference latency.
+The corrected dynamic INT8 implementation met the performance and prediction-label agreement criteria and was selected for this experiment.
 <!-- /portfolio:rejection -->
 
-The first compression attempt also failed a check on how the model's numbers were stored.
-I stopped it before evaluating its answers.
+The initial quantization call produced 38 signed INT8 matrix weights and two unsigned UINT8 embedding weights.
+It failed the mandatory signed-weight validation before inference, so prediction quality was not evaluated.
 The [failed attempt](results/parity/v2-quantization-default-failure.json) and [corrected approach](docs/engineering-log.md#v2-signed-8-bit-integration) remain documented.
-Matching answers after compression does not mean that every internal number stayed identical.
+The corrected approach quantized only matrix-multiplication weights and preserved the two floating-point embedding tables.
+Prediction-label agreement does not imply identical internal numerical values.
 
 ## What I learned
 
-- A format change alone did not guarantee better performance.
-- Testing several requests together changed the apparent winner.
-- I set pass/fail rules before measuring the changed versions.
-- I checked whether compression changed the model's answers.
-- I measured memory and image size alongside response time.
-- I kept failed experiments so others could understand the decisions.
-- I learned that reproduction needs prepared files and verified images, beyond a successful test command.
+- Format conversion alone did not guarantee faster inference.
+- Single-request and concurrent workloads exposed different performance trade-offs.
+- I used predefined acceptance criteria to avoid selecting only favorable results.
+- I checked prediction-label agreement after quantization; lower precision can change predictions.
+- Latency, throughput, memory consumption, and container image size are distinct optimization targets.
+- I preserved rejected experiments to make the final decision inspectable.
+- Reproducibility requires preserved inputs, model artifacts, environment information, and executable procedures.
 
 ## How to reproduce it
 
 **From committed evidence:** anyone can read the [full report](docs/benchmark_report.md) and [chart data](docs/chart_data.json) without model files.
-With the pinned offline test dependencies installed, check the report without writing:
+Before sourcing `scripts/env.sh`, create a project-local virtual environment with `python3.14 -m venv .venv`.
+The environment script activates that existing environment and sets main-disk temporary/cache paths; it does not install dependencies.
+Install the [pinned offline dependencies selected by CI](.github/workflows/ci.yml), then check the report without writing:
 
 ```bash
 source scripts/env.sh
 python bench/report.py --check
 ```
 
-To regenerate the report and both images, install the existing pinned development dependencies and run `make report`.
+To regenerate the report and both images, install CPU-only PyTorch first from `https://download.pytorch.org/whl/cpu`, then the existing pinned development dependencies, and run `make report`.
 The renderer uses the locally available DejaVu Sans font; no font download is needed.
 See the [reporting setup and commands](docs/engineering-log.md#portfolio-reporting).
 
@@ -139,12 +155,12 @@ These are different from running a performance experiment.
 
 ## Limitations
 
-- One computer, one small English model, and a fixed set of made-up sentences do not represent real user traffic.
+- One computer, one small English sentiment model, and fixed synthetic inputs do not represent a production load-test of real user traffic.
 - I compared answers with the original model, not with human labels. This is not a measurement of real-world accuracy.
 - Each setting had only three runs. The original and changed versions were measured on different dates on a shared virtual machine.
 - Client and server shared that machine. Other host activity and virtual-machine scheduling could affect results.
-- Each container had four processor cores, a fixed memory limit, and one server worker. Other limits may change the outcome.
-- Another processor, including an x86 machine, or a different workload may produce different results.
+- Each container had four CPU cores, a 2 GiB memory limit, and one server worker. Other limits may change the outcome.
+- Another CPU, including an x86 machine, or a different workload may produce different results.
 - Some timing, memory, and startup measurements varied substantially. All [variation warnings and ranges](docs/benchmark_report.md#variation-disclosures) remain available.
 - Recreating every model file from a fresh clone is not fully automatic. Historical preparation guards remain in place.
 - The historical model-licence record lacks the cached material needed for independent offline re-verification.
@@ -169,7 +185,7 @@ The [baseline provenance record](docs/engineering-log.md#pinned-local-v0-baselin
 
 The exact versions are v0 PyTorch/Transformers, v1 ONNX Runtime, and v2 ONNX Runtime with signed INT8 MatMul-only dynamic quantization.
 A single version is chosen when the container is built; the request does not run all three.
-Each image uses one worker and four model threads, without dynamic batching or graphics-card inference.
+Each image uses one worker and four model threads, without dynamic batching or GPU inference.
 The memory limit is exactly 2,147,483,648 bytes (2 GiB). Precise memory measurements use `cgroup memory.peak`.
 
 <details>
@@ -178,10 +194,10 @@ The memory limit is exactly 2,147,483,648 bytes (2 GiB). Precise memory measurem
 - **p50:** the halfway point after sorting one run's request times.
 - **p95:** the time at or below which 95% of that run's requests finished.
 - **p99:** the time at or below which 99% finished; the registered nearest-rank position is 990 of 1,000.
-- **Requests at the same time (concurrency):** how many requests can be in progress together.
-- **Compression (quantization):** storing some model numbers with less detail. It can reduce size or time, but may change answers.
-- **ONNX:** a model format used here with another program that runs the model.
-- **Label agreement:** whether a version gives the same positive/negative answer as v0 for the same sentence ID.
+- **Concurrent requests:** requests in progress at the same time.
+- **Dynamic quantization:** storing selected weights as lower-precision integers and calculating activation quantization parameters during inference. It can change predictions.
+- **ONNX / ONNX Runtime:** an exchange format for model graphs and the execution engine used for v1 and v2.
+- **Prediction-label agreement:** whether an implementation predicts the same label as v0 for each sentence ID; this is not human-labelled accuracy.
 - **Container memory:** memory recorded for the isolated service, including startup and warm-ups; this is not just model-file size.
 
 </details>

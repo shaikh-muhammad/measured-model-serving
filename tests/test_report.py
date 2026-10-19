@@ -346,11 +346,11 @@ def test_readme_numeric_tables_independent_of_generator():
     for i,v in enumerate(("v0","v1","v2")):
         cells=[cell.strip() for cell in human[i]]
         if v=="v0":
-            assert cells[6:]==["Original reference","Starting point"]
+            assert cells[6:]==["Original reference","Baseline"]
         else:
             candidate=statistics.median(a["p99"] for _,a in attempts[v,4])
             change=(candidate-b0)/b0*100
-            expected=("Rejected: " if change>0 else "Kept: ")+f"{abs(change):.0f}% "+("slower" if change>0 else "faster")
+            expected=("Rejected — approximately " if change>0 else "Kept — approximately ")+f"{abs(change):.0f}% "+("higher" if change>0 else "lower")+" p99 latency"
             assert cells[6:]==["Yes, all 1,000 sentences",expected]
     serial=[statistics.median(a["p50"] for _,a in attempts[v,1]) for v in ("v0","v1")]
     tails=[statistics.median(a["p99"] for _,a in attempts[v,1]) for v in ("v0","v1")]
@@ -386,9 +386,10 @@ def test_readme_structure_language_and_preserved_archive():
     assert re.findall(r"^## (.+)$",text,re.M)==[
         "What I measured and why","Results","What did not help","What I learned",
         "How to reproduce it","Limitations","Licences and provenance","Technical details"]
-    human=text.split("## Technical details")[0]
-    banned=r"MatMul|nearest-rank|cgroup|quantize_dynamic|opset|INT8|UINT8|tokenizer artifact|preregistered|concurrency"
-    assert not re.findall(banned,human,re.I)
+    assert "sentiment classification: it predicts a positive or negative label" in text
+    assert "p99 latency is the response-time threshold within which 99%" in text
+    assert "requests were not pooled across runs" in text
+    assert "Prediction-label agreement does not measure accuracy against human labels" in text
     original=subprocess.check_output(["git","show","4d5a44a65141d1427adab4bc94ee4c85300de5f5:README.md"],cwd=ROOT).decode()
     def rebase(match):
         target=match[1]

@@ -614,9 +614,60 @@ def render_graphics(data):
     return images,geometry
 
 
+def editorial_readme(data):
+    """Render current README prose while retaining chart JSON's legacy text."""
+    busy, serial = [w["versions"] for w in data["workloads"]]
+    v0, v1, v2 = busy
+    def metric(row, key): return row["metrics"][key]
+    outcome = (f'Under four concurrent requests, v2 reduced median run-level p99 latency from '
+               f'{metric(v0, "p99")["display_number"]} to {metric(v2, "p99")["display_number"]} milliseconds: '
+               f'a {-metric(v2, "p99")["change_percent"]:.0f}% reduction.\n'
+               f'Peak container memory use fell by {-metric(v2, "peak_container_memory")["change_percent"]:.0f}%. '
+               'These results apply to this computer and workload.')
+    columns = ["Version", "Implementation", "p99 latency", "Throughput (requests/s)",
+               "Peak container memory", "Container image size", "Prediction-label agreement", "Decision"]
+    table = ["| " + " | ".join(columns) + " |", "| " + " | ".join(["---"] * len(columns)) + " |"]
+    descriptions = {"v0": "PyTorch / Transformers", "v1": "ONNX Runtime FP32",
+                    "v2": "ONNX Runtime, dynamic INT8"}
+    for row in busy:
+        m = row["metrics"]; v = row["version"]
+        change = m["p99"]["change_percent"]
+        decision = "Baseline" if v == "v0" else (
+            {"KEEP": "Kept", "REJECT": "Rejected", "INCONCLUSIVE": "Inconclusive"}[row["decision"]]
+            + f' — approximately {abs(change):.0f}% ' + ("higher" if change > 0 else "lower") + " p99 latency")
+        agreement = "Original reference" if v == "v0" else f'Yes, all {row["agreement"]["unique_ids"]:,} sentences'
+        table.append("| " + " | ".join([v, descriptions[v], m["p99"]["display"],
+            m["throughput_requests_per_second"]["display_number"], m["peak_container_memory"]["display"],
+            m["docker_image_size_bytes"]["display"], agreement, decision]) + " |")
+    # Preserve the complete exact-numbers table and its methodological notes.
+    exact = data["readme"]["results"].split("<details>", 1)[1].split("</details>", 1)[0]
+    results = (outcome + "\n\n" + "\n".join(table) + "\n\n<details>" + exact + "</details>\n\n"
+        "p99 latency is the response-time threshold within which 99% of measured requests complete. "
+        "Lower values indicate better performance near the slow end of the distribution.\n"
+        "The published p99 is the median of three run-level p99 values, calculated separately using the nearest-rank method; "
+        "requests were not pooled across runs.\n"
+        "Throughput measures completed requests per second. Peak container memory includes startup and warm-ups; "
+        "container image size measures storage, not running memory.\n"
+        f'Both optimized implementations matched baseline prediction labels for all {v2["agreement"]["unique_ids"]:,} '
+        "fixed test sentences across all six runs each. Prediction-label agreement does not measure accuracy against human labels.")
+    s0, s1, _ = serial
+    findings = (f'With individual requests, v1 reduced median run-level p50 latency from '
+        f'{metric(s0, "p50")["display_number"]} to {metric(s1, "p50")["display_number"]} milliseconds.\n'
+        f'Its p99 latency was almost unchanged: {metric(s0, "p99")["display_number"]} versus '
+        f'{metric(s1, "p99")["display_number"]} milliseconds.\n\n'
+        "With four concurrent requests, v1 had higher p50, p95, and p99 latency than v0.\n"
+        "The conversion helped typical single-request latency, but regressed under the primary workload.\n"
+        "I rejected v1 under the predefined acceptance criteria; the single-request improvement did not override the concurrent-workload result.")
+    rejection = (f'I rejected ONNX Runtime FP32 because it increased p99 latency by approximately '
+        f'{metric(v1, "p99")["change_percent"]:.0f}% under the primary concurrent workload.\n'
+        "A smaller container image did not necessarily mean lower inference latency.\n"
+        "The corrected dynamic INT8 implementation met the performance and prediction-label agreement criteria and was selected for this experiment.")
+    return dict(results=results, findings=findings, rejection=rejection)
+
+
 def readme_output(data):
     text = (ROOT / "README.md").read_text()
-    for key, value in data["readme"].items():
+    for key, value in editorial_readme(data).items():
         opening = "<!-- portfolio:" + key + " -->"
         closing = "<!-- /portfolio:" + key + " -->"
         require(text.count(opening) == text.count(closing) == 1,
