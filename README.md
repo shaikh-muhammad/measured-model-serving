@@ -2,7 +2,7 @@
 
 I made a sentence-reading model respond faster on an ordinary computer chip without a graphics card, then measured each change—including one that made it worse.
 
-![Same AI model, three ways to run it](docs/result-cards.png)
+![Evaluating CPU Inference Optimizations](docs/result-cards.png)
 
 ```mermaid
 flowchart TD

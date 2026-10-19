@@ -509,7 +509,7 @@ def portfolio_layout(data):
                                           region=region, color=color, weight=weight, align=align))
     d1, d3 = GRAPHICS
     header = [50, 20, 2150, 195]
-    text(d1, "title", "Same AI model, three ways to run it", 60, 45, 34, header, weight="bold")
+    text(d1, "title", "Evaluating CPU Inference Optimizations", 60, 45, 34, header, weight="bold")
     text(d1, "subtitle", "Four requests at the same time · Middle result of three runs on one computer",
          60, 125, 22, header, color="secondary")
     for i, row in enumerate(data["workloads"][0]["versions"]):

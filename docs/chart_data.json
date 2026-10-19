@@ -1176,7 +1176,7 @@
       "texts": [
         {
           "id": "title",
-          "text": "Same AI model, three ways to run it",
+          "text": "Evaluating CPU Inference Optimizations",
           "x": 60,
           "y": 45,
           "size": 34,
@@ -2729,7 +2729,7 @@
     }
   },
   "labels": [
-    "Same AI model, three ways to run it",
+    "Evaluating CPU Inference Optimizations",
     "Four requests at the same time · Middle result of three runs on one computer",
     "STARTING POINT",
     "baseline",
@@ -2822,7 +2822,7 @@
     "Each cell is the middle of three run-level measurements · Lower times are better"
   ],
   "image_sha256": {
-    "docs/result-cards.png": "84afb63d4b0239b7146c627a2c36523c89c23309f6aab227ff3c8765945d2026",
+    "docs/result-cards.png": "cd108bb5eab7a4c446952196bff4846f35075f32ce056e22638bf3c62ac80592",
     "docs/typical-vs-slowest.png": "53023300f6f58891712ea46030ba977c9513711202aea9141685beed506bb692"
   }
 }
