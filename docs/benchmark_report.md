@@ -65,6 +65,8 @@ Median across three run-level medians (minimum–maximum of those medians), in m
 | v2 signed INT8 | 1 | 37.830668 (37.612896–39.316501) | 44.921972 (43.039369–46.190486) | 0.069153 (0.069152–0.069423) | 83.060486 (80.940677–88.633931) |
 | v2 signed INT8 | 4 | 82.341829 (79.228876–83.188111) | 103.048187 (102.120992–105.484013) | 0.068588 (0.067302–0.068634) | 201.814199 (191.316963–203.088664) |
 
+Both ONNX implementations reconstruct the tokenizer for every request in `StandaloneEncoder.encode()` ([scripts/verify_tokenizer.py:124](../scripts/verify_tokenizer.py#L124)), called by [src/onnx_backend.py:65](../src/onnx_backend.py#L65); v2 uses the same encoder and inherited inference path ([src/onnx_backend_v2.py:13](../src/onnx_backend_v2.py#L13), [line 31](../src/onnx_backend_v2.py#L31)). v0 initializes its tokenizer once ([src/backend.py:34](../src/backend.py#L34)). At concurrency 4, v1 had a faster model stage than v0 (235.3 vs 345.7 ms), while the ONNX tokenize-stage medians (89.1 ms for v1 and 82.3 ms for v2, versus 0.61 ms for v0) are consistent with this per-request overhead. Its contribution to the end-to-end p99 regression was not isolated by a separate measurement.
+
 ## Label agreement
 
 All six original v0 HTTP runs agree for every dataset ID. Each version is compared against these original labels across both concurrency settings.

@@ -277,6 +277,7 @@ def markdown(e):
         stages = groups[v, c]["statistics"]["server_stage_timings"]
         cells = [interval(dict(median=stages[k]["median_ms"], range=stages[k]["range_ms"])) for k in runner.STAGES]
         lines.append(f"| {NAMES[v]} | {c} | " + " | ".join(cells) + " |")
+    lines += ["", 'Both ONNX implementations reconstruct the tokenizer for every request in `StandaloneEncoder.encode()` ([scripts/verify_tokenizer.py:124](../scripts/verify_tokenizer.py#L124)), called by [src/onnx_backend.py:65](../src/onnx_backend.py#L65); v2 uses the same encoder and inherited inference path ([src/onnx_backend_v2.py:13](../src/onnx_backend_v2.py#L13), [line 31](../src/onnx_backend_v2.py#L31)). v0 initializes its tokenizer once ([src/backend.py:34](../src/backend.py#L34)). At concurrency 4, v1 had a faster model stage than v0 (235.3 vs 345.7 ms), while the ONNX tokenize-stage medians (89.1 ms for v1 and 82.3 ms for v2, versus 0.61 ms for v0) are consistent with this per-request overhead. Its contribution to the end-to-end p99 regression was not isolated by a separate measurement.']
     lines += ["", "## Label agreement", "",
               "All six original v0 HTTP runs agree for every dataset ID. Each version is compared against these original labels across both concurrency settings.", "",
               "| Version | Unique IDs | Matching HTTP labels | Agreement | Mismatching IDs | Mismatch records by bucket |",
@@ -492,10 +493,10 @@ def portfolio_readme(data):
                  f'Its slowest-1% time was almost unchanged: {metric(s0, "p99")["display_number"]} versus '
                  f'{metric(s1, "p99")["display_number"]} milliseconds.\n\n'
                  'With four requests at the same time, v1 was slower at every reported delay point.\n'
-                 'The format change helped when requests came one by one, but not when several arrived together.\n'
-                 'I decided in advance that the busy case decides, so I rejected the format-only version.')
-    rejection = (f'Converting the model to another format made the slowest requests about '
-                 f'{metric(v1, "p99")["change_percent"]:.0f}% slower in the busy test, so I rejected that version.\n'
+                 'The ONNX version helped when requests came one by one, but not when several arrived together.\n'
+                 'I decided in advance that the busy case decides, so I rejected v1 as built.')
+    rejection = (f'As built, the ONNX FP32 version made the slowest requests about '
+                 f'{metric(v1, "p99")["change_percent"]:.0f}% slower in the busy test, so I rejected it.\n'
                  'Compressing the converted model produced the observed improvement.\n'
                  'A smaller download did not guarantee a shorter wait.')
     return dict(results=results, findings=comparison, rejection=rejection)
