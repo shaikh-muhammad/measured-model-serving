@@ -27,6 +27,10 @@ checks card/image containment, every pair for overlap, repeatability and committ
 CI runs the existing four-file model-free selection with the new checks in tests/test_report.py;
 it does not install the renderer. Its historical 108-test count below predates these added tests.
 
+## Stage-timing clarification
+
+Both ONNX implementations reconstruct the tokenizer for every request in `StandaloneEncoder.encode()` ([scripts/verify_tokenizer.py:124](../scripts/verify_tokenizer.py#L124)), called by [src/onnx_backend.py:65](../src/onnx_backend.py#L65); v2 uses the same encoder and inherited inference path ([src/onnx_backend_v2.py:13](../src/onnx_backend_v2.py#L13), [line 31](../src/onnx_backend_v2.py#L31)). v0 initializes its tokenizer once ([src/backend.py:34](../src/backend.py#L34)). At concurrency 4, v1 had a faster model stage than v0 (235.3 vs 345.7 ms), while the ONNX tokenize-stage medians (89.1 ms for v1 and 82.3 ms for v2, versus 0.61 ms for v0) are consistent with this per-request overhead. Its contribution to the end-to-end p99 regression was not isolated by a separate measurement.
+
 Original file paths inside archived shell examples remain relative to the repository root.
 The full archive follows unchanged except for Markdown links.
 

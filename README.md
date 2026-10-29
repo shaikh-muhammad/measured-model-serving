@@ -6,7 +6,7 @@ I evaluated three implementations of a sentiment-classification service under co
 I measured inference latency, throughput, memory consumption, and container image size.
 
 Under the primary workload, the optimized implementation achieved 37% lower p99 latency and 39% lower measured peak container memory than the baseline.
-A format-only conversion increased p99 latency and was rejected.
+ONNX Runtime FP32 (v1), as implemented, increased p99 latency and was rejected.
 
 ![Evaluating CPU Inference Optimizations](docs/result-cards.png)
 
@@ -111,11 +111,11 @@ The initial quantization call produced 38 signed INT8 matrix weights and two uns
 It failed the mandatory signed-weight validation before inference, so prediction quality was not evaluated.
 The [failed attempt](results/parity/v2-quantization-default-failure.json) and [corrected approach](docs/engineering-log.md#v2-signed-8-bit-integration) remain documented.
 The corrected approach quantized only matrix-multiplication weights and preserved the two floating-point embedding tables.
-Prediction-label agreement does not imply identical internal numerical values.
+Prediction-label agreement does not imply identical internal numerical values. In the saved runs, v2 confidence scores differed from v0 by up to about 0.18 while prediction labels remained unchanged.
 
 ## What I learned
 
-- Format conversion alone did not guarantee faster inference.
+- A faster model stage did not make the whole service faster: in v1, tokenization added about 89 ms per request at concurrency 4.
 - Single-request and concurrent workloads exposed different performance trade-offs.
 - I used predefined acceptance criteria to avoid selecting only favorable results.
 - I checked prediction-label agreement after quantization; lower precision can change predictions.
